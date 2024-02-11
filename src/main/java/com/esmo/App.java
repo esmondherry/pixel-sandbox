@@ -30,9 +30,9 @@ public class App extends Application {
     private SimpleIntegerProperty nodes = new SimpleIntegerProperty(0);
     private SimpleIntegerProperty heightProp = new SimpleIntegerProperty(0);
     private SimpleIntegerProperty widthProp = new SimpleIntegerProperty(0);
-    private int width = 60;
-    private int height = 30;
-    private int unit = 15;
+    final private int width = 90;
+    final private int height = 45;
+    final private double unit = 10;
     private Grid grid;
 
     boolean auto = false;
@@ -136,16 +136,19 @@ public class App extends Application {
 
             private void calcVisible() {
                 int visibleCount = 0;
-                for (Node rectangle : pane.getChildren()) {
-                    if (rectangle.isVisible()) {
-                        visibleCount++;
+                Particle[][] particleGrid = grid.getGrid();
+                for (int x = 0; x < particleGrid.length; x++) {
+                    for (int y = 0; y < particleGrid[0].length; y++) {
+                        if (particleGrid[x][y].exists) {
+                            visibleCount++;
+                        }
                     }
                 }
                 visible.set(visibleCount);
             }
 
             private void calcNodes() {
-                nodes.set(pane.getChildren().size());
+                nodes.set((int) (grid.getHeight() * grid.getWidth()));
             }
 
             private void calcGridSize() {

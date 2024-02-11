@@ -1,58 +1,47 @@
 package com.esmo;
 
 import com.esmo.model.Grid;
+import com.esmo.model.Particle;
 
 import javafx.geometry.Point2D;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Rectangle;
 
 public class ThePane extends Pane {
 
     private Point2D mousePos;
     private boolean mousePressed;
-
-    public Rectangle sGrid[][];
-
     private double unit;
-    private double height;
-    private double width;
-
     private Grid grid;
 
-    public ThePane(Grid grid, int unit) {
+    private Canvas canvas;
+    private GraphicsContext gc;
+
+    public ThePane(Grid grid, double unit) {
         this.grid = grid;
-        this.width = grid.getWidth();
-        this.height = grid.getHeight();
         this.unit = unit;
+        this.canvas = new Canvas();
+        this.gc = canvas.getGraphicsContext2D();
+        this.mousePos = new Point2D(0, 0);
+        this.mousePressed = false;
 
         setStyle("-fx-background-color: #404040;");
-        setPrefHeight(unit * height);
-        setPrefWidth(unit * width);
-        minHeight(unit);
-        minWidth(unit);
+        setPrefWidth(grid.getWidth() * unit);
+        setPrefHeight(grid.getHeight() * unit);
+        setMinHeight(unit);
 
-        setOnMouseMoved(e -> logPos(e));
-        setOnMouseDragged(e -> logPos(e));
+        widthProperty().addListener((obs, oldWidth, newWidth) -> updateCanvasSize());
+        heightProperty().addListener((obs, oldHeight, newHeight) -> updateCanvasSize());
 
-        widthProperty().addListener((obs, oldWidth, newWidth) -> {
-            updateGridSize();
-        });
-        heightProperty().addListener((obs, oldHeight, newHeight) -> {
-            updateGridSize();
-        });
+        setOnMousePressed(e -> handleMousePressed(e));
+        setOnMouseReleased(e -> handleMouseReleased(e));
+        setOnMouseDragged(e -> logPosition(e));
+        setOnMouseMoved(e -> logPosition(e));
 
-        mousePos = new Point2D(0, 0);
-        setOnMousePressed(e -> {
-            mousePressed = true;
-            logPos(e);
-        });
-        setOnMouseReleased(e -> {
-            mousePressed = false;
-        });
-
-        initSGrid();
-
+        getChildren().add(canvas);
+        updateCanvasSize();
     }
 
     public boolean isMousePressed() {
@@ -71,66 +60,41 @@ public class ThePane extends Pane {
         return mousePos;
     }
 
-    public void initSGrid() {
-        sGrid = new Rectangle[(int) width][(int) height];
-
-        getChildren().clear();
-        for (int x = 0; x < sGrid.length; x++) {
-            for (int y = 0; y < sGrid[0].length; y++) {
-                Rectangle rect = new Rectangle(unit, unit);
-                rect.setVisible(false);
-                rect.setLayoutX(x * unit);
-                rect.setLayoutY(y * unit);
-                getChildren()
-                        .add(rect);
-
-                sGrid[x][y] = rect;
-            }
-        }
-    }
-
-    public void updateSGridSize(double newHeight, double newWidth) {
-        this.height = newHeight;
-        this.width = newWidth;
-        initSGrid();
-    }
-
     public void drawGrid() {
-        for (int x = 0; x < grid.getGrid().length; x++) {
-            for (int y = 0; y < grid.getGrid()[0].length; y++) {
-                if (grid.getGrid()[x][y].exists) {
-                    sGrid[x][y].setFill(grid.getGrid()[x][y].getColor());
-                    sGrid[x][y].setVisible(true);
-                } else {
-                    sGrid[x][y].setVisible(false);
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        Particle[][] particleGrid = grid.getGrid();
+        for (int x = 0; x < particleGrid.length; x++) {
+            for (int y = 0; y < particleGrid[0].length; y++) {
+                if (particleGrid[x][y].exists) {
+                    gc.setFill(particleGrid[x][y].getColor());
+                    gc.fillRect(x * unit, y * unit, unit, unit);
                 }
             }
         }
     }
 
-    private void logPos(MouseEvent e) {
-        if (!mousePressed) {
-            return;
-        }
-        double x = e.getX();
-        double y = e.getY();
-
-        mousePos = new Point2D(x, y);
+    private void handleMousePressed(MouseEvent e) {
+        mousePressed = true;
+        logPosition(e);
     }
 
-    private void updateGridSize() {
-        int newWidth = (int) (getWidth() / unit);
-        int newHeight = (int) (getHeight() / unit);
-
-        if (width == newWidth && height == newHeight) {
-            return;
-        }
-
-        grid.updateGridSize(newWidth, newHeight);
-        updateSGridSize(newHeight, newWidth);
-
-        height = newHeight;
-        width = newWidth;
+    private void handleMouseReleased(MouseEvent e) {
+        mousePressed = false;
     }
 
+    private void logPosition(MouseEvent e) {
+        if (mousePressed) {
+            double x = e.getX();
+            double y = e.getY();
+            mousePos = new Point2D(x, y);
+        }
+    }
+
+    private void updateCanvasSize() {
+        double newWidth = getWidth();
+        double newHeight = getHeight();
+        canvas.setWidth(newWidth);
+        canvas.setHeight(newHeight);
+        grid.updateGridSize((int) (newWidth / unit), (int) (newHeight / unit));
+    }
 }
