@@ -1,5 +1,6 @@
 package com.esmo;
 
+//45_000@60
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -81,7 +82,9 @@ public class App extends Application {
         options.getOnTop().setOnAction(e -> {
             primaryStage.setAlwaysOnTop(options.getOnTop().isSelected());
         });
-
+        options.getClear().setOnAction(e -> {
+            grid.clear();
+        });
         optionsButton.setOnAction(event -> {
             if (stackPane.getChildren().contains(borderPane)) {
                 stackPane.getChildren().remove(borderPane);

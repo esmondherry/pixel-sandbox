@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -20,6 +21,11 @@ public class Options extends ScrollPane {
     private CheckBox auto;
     private ComboBox<String> particleType;
     private CheckBox onTop;
+    private Button clear;
+
+    public Button getClear() {
+        return clear;
+    }
 
     public CheckBox getOnTop() {
         return onTop;
@@ -47,6 +53,7 @@ public class Options extends ScrollPane {
         sandColor = new ColorPicker(Color.CYAN);
 
         reset = new Button("Reset");
+        clear = new Button("Clear");
 
         auto = new CheckBox("Auto");
 
@@ -54,7 +61,7 @@ public class Options extends ScrollPane {
 
         vBox.getChildren().addAll(new Label("Direction"), windDirection, new Label("Strength"), windStrength,
                 new Label("Type"), particleType,
-                new Label("Sand Color"), sandColor, auto, reset, new Separator(), onTop);
+                new Label("Sand Color"), sandColor, auto, new HBox(reset, clear), new Separator(), onTop);
         setContent(vBox);
     }
 
