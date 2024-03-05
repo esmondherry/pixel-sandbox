@@ -5,12 +5,13 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-public class Options extends VBox {
+public class Options extends ScrollPane {
 
     private Slider windDirection;
     private Slider windStrength;
@@ -25,7 +26,8 @@ public class Options extends VBox {
     }
 
     public Options() {
-        setSpacing(5);
+        VBox vBox = new VBox();
+        vBox.setSpacing(5);
 
         windDirection = new Slider(0, 1, .5);
         windDirection.setBlockIncrement(.10);
@@ -50,9 +52,10 @@ public class Options extends VBox {
 
         onTop = new CheckBox("Always On Top");
 
-        getChildren().addAll(new Label("Direction"), windDirection, new Label("Strength"), windStrength,
+        vBox.getChildren().addAll(new Label("Direction"), windDirection, new Label("Strength"), windStrength,
                 new Label("Type"), particleType,
                 new Label("Sand Color"), sandColor, auto, reset, new Separator(), onTop);
+        setContent(vBox);
     }
 
     public Slider getWindDirection() {

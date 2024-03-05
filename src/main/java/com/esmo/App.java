@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.esmo.model.Grid;
+import com.esmo.model.Particle;
 import com.esmo.utils.Palette;
 import com.esmo.view.Hud;
 import com.esmo.view.Options;
@@ -16,6 +17,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -42,6 +44,8 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception {
         grid = new Grid(width, height);
         Options options = new Options();
+        options.setMaxWidth(155);
+        StackPane.setAlignment(options, Pos.CENTER_RIGHT);
 
         Hud hud = new Hud();
         hud.addItem("fps", fps);
@@ -54,13 +58,19 @@ public class App extends Application {
 
         Button optionsButton = new Button("⚙");
 
+        BorderPane borderPane = new BorderPane();
+        borderPane.setLeft(optionsButton);
+        borderPane.setCenter(options);
+
+        borderPane.setMaxWidth(180);
+        borderPane.setOnMouseEntered(e -> makeSolid(e));
+        borderPane.setOnMouseExited(e -> makeTransparent(e));
+        StackPane.setAlignment(borderPane, Pos.CENTER_RIGHT);
+
         StackPane stackPane = new StackPane();
         StackPane.setAlignment(hud, Pos.TOP_LEFT);
         StackPane.setAlignment(optionsButton, Pos.TOP_RIGHT);
         stackPane.getChildren().addAll(pane, hud, optionsButton);
-
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(stackPane);
 
         options.getReset().setOnAction(e -> {
             reset = true;
@@ -71,15 +81,24 @@ public class App extends Application {
         options.getOnTop().setOnAction(e -> {
             primaryStage.setAlwaysOnTop(options.getOnTop().isSelected());
         });
-        optionsButton.setOnAction(e -> {
-            if (borderPane.getRight() == null) {
-                borderPane.setRight(options);
+
+        optionsButton.setOnAction(event -> {
+            if (stackPane.getChildren().contains(borderPane)) {
+                stackPane.getChildren().remove(borderPane);
+                stackPane.getChildren().add(optionsButton);
+                optionsButton.setOnMouseEntered(e -> makeSolid(e));
+                optionsButton.setOnMouseExited(e -> makeTransparent(e));
             } else {
-                borderPane.setRight(null);
+                optionsButton.setOnMouseEntered(null);
+                optionsButton.setOnMouseExited(null);
+                optionsButton.setOpacity(1);
+                stackPane.getChildren().remove(optionsButton);
+                borderPane.setLeft(optionsButton);
+                stackPane.getChildren().add(borderPane);
             }
         });
 
-        Scene scene = new Scene(borderPane);
+        Scene scene = new Scene(stackPane);
 
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
@@ -212,7 +231,8 @@ public class App extends Application {
                 double x = position.getX() - (position.getX() % pane.getUnit());
                 double y = position.getY() - (position.getY() % pane.getUnit());
 
-                if (x >= 0 && x < (grid.getWidth() * pane.getUnit()) && y >= 0 && y < (grid.getHeight() * pane.getUnit())) {
+                if (x >= 0 && x < (grid.getWidth() * pane.getUnit()) && y >= 0
+                        && y < (grid.getHeight() * pane.getUnit())) {
                     int gridX = (int) (x / pane.getUnit());
                     int gridY = (int) (y / pane.getUnit());
                     grid.addToGrid(gridX, gridY, color, type);
@@ -222,6 +242,14 @@ public class App extends Application {
         };
         animationTimer.start();
 
+    }
+
+    private void makeTransparent(MouseEvent e) {
+        ((Node) e.getSource()).setOpacity(.25);
+    }
+
+    private void makeSolid(MouseEvent e) {
+        ((Node) e.getSource()).setOpacity(1);
     }
 
 }
