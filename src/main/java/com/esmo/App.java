@@ -114,6 +114,8 @@ public class App extends Application {
                 case DIGIT2:
                     options.setParticleType("Water");
                     break;
+                default:
+                    break;
             }
         });
         primaryStage.setTitle("1");
