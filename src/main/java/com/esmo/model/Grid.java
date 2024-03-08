@@ -80,10 +80,17 @@ public class Grid {
                 tmpgrid[i][j] = grid[i][j];
             }
         }
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                grid[i][j].logic(grid, tmpgrid, windStrength,
-                        windDirection);
+        for (int y = 0; y < height; y++) {
+            if (y % 2 == 0) {
+                for (int x = 0; x < width; x++) {
+                    grid[x][y].logic(grid, tmpgrid, windStrength,
+                            windDirection);
+                }
+            } else {
+                for (int x = width - 1; x >= 0; x--) {
+                    grid[x][y].logic(grid, tmpgrid, windStrength,
+                            windDirection);
+                }
             }
         }
     }
