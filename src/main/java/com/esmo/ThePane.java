@@ -1,6 +1,5 @@
 package com.esmo;
 
-import java.security.cert.PKIXRevocationChecker.Option;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -33,6 +32,14 @@ public class ThePane extends Pane {
     private Canvas canvas;
     private GraphicsContext gc;
     protected boolean auto;
+    private double autoSpeed;
+
+    public void setAutoSpeed(double autoSpeed) {
+        if (autoSpeed < 0) {
+            autoSpeed = 0;
+        }
+        this.autoSpeed = autoSpeed;
+    }
 
     public void setAuto(boolean auto) {
         this.auto = auto;
@@ -46,6 +53,7 @@ public class ThePane extends Pane {
         this.mousePos = new Point2D(0, 0);
         this.mousePressed = false;
         this.options = options;
+        this.autoSpeed = 1;
 
         setStyle("-fx-background-color: #404040;");
         setPrefWidth(grid.getWidth() * unit);
@@ -76,7 +84,7 @@ public class ThePane extends Pane {
 
             @Override
             public void handle(long now) {
-
+                calcFrames(now);
                 if (reset) {
                     reset = reset();
                 } else {
@@ -126,13 +134,23 @@ public class ThePane extends Pane {
 
             private void auto() {
                 color = colorList.get(random.nextInt(colorList.size()));
-                grid.addToGrid((int) (Math.random() * grid.getWidth()), 0, color, "Sand");
+                if (autoSpeed < 1) {
+                    int speed = (int) (1 / autoSpeed);
+                    if (frameCount % speed == 0) {
+                        grid.addToGrid(random.nextInt(grid.getWidth()), 0, color, "Sand");
+                    }
+                } else {
+                    for (int i = 0; i < autoSpeed; i++) {
+                        grid.addToGrid(random.nextInt(grid.getWidth()), 0, color, "Sand");
+                    }
+
+                }
 
                 int count = 0;
                 for (int i = 0; i < grid.getGrid().length; i++) {
                     if (grid.getGrid()[i][0].exists == true) {
                         count++;
-                        if (count > grid.getWidth() / (grid.getWidth() / 2)) {
+                        if (count > grid.getWidth() / 2) {
                             reset = true;
                             colorList = Palette.getColorList().get(random.nextInt(Palette.getColorList().size()));
                         }
@@ -152,6 +170,18 @@ public class ThePane extends Pane {
                     grid.addToGrid(gridX, gridY, color, type);
                 }
             }
+
+            private long lastTime = 0;
+            private int frameCount = 0;
+
+            private void calcFrames(long now) {
+                frameCount++;
+                if (now - lastTime >= App.ONE_SECOND) {
+                    frameCount = 0;
+                    lastTime = now;
+                }
+            }
+
         };
     }
 
