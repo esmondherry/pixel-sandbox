@@ -1,13 +1,21 @@
 package com.esmo;
 
+import java.security.cert.PKIXRevocationChecker.Option;
+import java.util.ArrayList;
+import java.util.Random;
+
 import com.esmo.model.Grid;
 import com.esmo.model.Particle;
+import com.esmo.utils.Palette;
+import com.esmo.view.Options;
 
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 public class ThePane extends Pane {
 
@@ -15,17 +23,29 @@ public class ThePane extends Pane {
     private boolean mousePressed;
     private double unit;
     private Grid grid;
+    private boolean reset;
+    private Options options;
+
+    public void setReset(boolean reset) {
+        this.reset = reset;
+    }
 
     private Canvas canvas;
     private GraphicsContext gc;
+    protected boolean auto;
 
-    public ThePane(Grid grid, double unit) {
+    public void setAuto(boolean auto) {
+        this.auto = auto;
+    }
+
+    public ThePane(Grid grid, double unit, Options options) {
         this.grid = grid;
         this.unit = unit;
         this.canvas = new Canvas();
         this.gc = canvas.getGraphicsContext2D();
         this.mousePos = new Point2D(0, 0);
         this.mousePressed = false;
+        this.options = options;
 
         setStyle("-fx-background-color: #404040;");
         setPrefWidth(grid.getWidth() * unit);
@@ -42,6 +62,97 @@ public class ThePane extends Pane {
 
         getChildren().add(canvas);
         updateCanvasSize();
+
+        animationTimer().start();
+    }
+
+    private AnimationTimer animationTimer() {
+        return new AnimationTimer() {
+            private int resetCount = 0;
+            private Color color;
+            private Random random = new Random();
+            private ArrayList<Color> colorList = Palette.getColorList()
+                    .get(random.nextInt(Palette.getColorList().size()));
+
+            @Override
+            public void handle(long now) {
+
+                if (reset) {
+                    reset = reset();
+                } else {
+                    handleInput();
+                }
+                grid.logic(options.getWindStrength().getValue(),
+                        options.getWindDirection().getValue());
+
+                drawGrid();
+
+            }
+
+            private boolean reset() {
+                if (resetCount > 60 * 7) {
+                    grid.clear();
+                    resetCount = 0;
+                    return false;
+                }
+                int existing = 0;
+                for (int i = 0; i < grid.getWidth(); i++) {
+                    for (int j = 0; j < grid.getHeight(); j++) {
+                        if (grid.getGrid()[i][j].exists) {
+                            existing++;
+                            if (Math.random() < .02) {
+                                grid.remove(i, j);
+                            }
+                        }
+                    }
+                }
+                if (existing > (0)) {
+                    resetCount++;
+                    return true;
+                } else {
+                    resetCount = 0;
+                    return false;
+                }
+            }
+
+            private void handleInput() {
+                if (auto) {
+                    auto();
+                }
+                if (isMousePressed()) {
+                    addToGrid(getMousePos(), options.getSandColor(), options.getParticleType());
+                }
+            }
+
+            private void auto() {
+                color = colorList.get(random.nextInt(colorList.size()));
+                grid.addToGrid((int) (Math.random() * grid.getWidth()), 0, color, "Sand");
+
+                int count = 0;
+                for (int i = 0; i < grid.getGrid().length; i++) {
+                    if (grid.getGrid()[i][0].exists == true) {
+                        count++;
+                        if (count > grid.getWidth() / (grid.getWidth() / 2)) {
+                            reset = true;
+                            colorList = Palette.getColorList().get(random.nextInt(Palette.getColorList().size()));
+                        }
+                    }
+                }
+
+            }
+
+            private void addToGrid(Point2D position, Color color, String type) {
+                double x = position.getX() - (position.getX() % getUnit());
+                double y = position.getY() - (position.getY() % getUnit());
+
+                if (x >= 0 && x < (grid.getWidth() * getUnit()) && y >= 0
+                        && y < (grid.getHeight() * getUnit())) {
+                    int gridX = (int) (x / getUnit());
+                    int gridY = (int) (y / getUnit());
+                    grid.addToGrid(gridX, gridY, color, type);
+                }
+            }
+        };
     }
 
     public boolean isMousePressed() {

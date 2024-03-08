@@ -38,9 +38,6 @@ public class App extends Application {
     final private double unit = 10;
     private Grid grid;
 
-    boolean auto = false;
-    boolean reset = false;
-
     @Override
     public void start(Stage primaryStage) throws Exception {
         grid = new Grid(width, height);
@@ -55,7 +52,7 @@ public class App extends Application {
         hud.addItem("h", heightProp);
         hud.addItem("w", widthProp);
 
-        ThePane pane = new ThePane(grid, unit);
+        ThePane pane = new ThePane(grid, unit, options);
 
         Button optionsButton = new Button("⚙");
 
@@ -74,10 +71,10 @@ public class App extends Application {
         stackPane.getChildren().addAll(pane, hud, optionsButton);
 
         options.getReset().setOnAction(e -> {
-            reset = true;
+            pane.setReset(true);
         });
         options.getAuto().setOnAction(e -> {
-            auto = options.getAuto().isSelected();
+            pane.setAuto(options.getAuto().isSelected());
         });
         options.getOnTop().setOnAction(e -> {
             primaryStage.setAlwaysOnTop(options.getOnTop().isSelected());
@@ -106,8 +103,10 @@ public class App extends Application {
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
                 case A:
+                    boolean auto = options.getAuto().isSelected();
                     auto = !auto;
                     options.getAuto().setSelected(auto);
+                    pane.setAuto(auto);
                     break;
                 case DIGIT1:
                     options.setParticleType("Sand");
@@ -124,11 +123,6 @@ public class App extends Application {
         AnimationTimer animationTimer = new AnimationTimer() {
             private long lastTime = 0;
             private int frameCount = 0;
-            private Color color;
-            private Random random = new Random();
-            private ArrayList<Color> colorList = Palette.getColorList()
-                    .get(random.nextInt(Palette.getColorList().size()));
-            private int resetCount = 0;
 
             @Override
             public void handle(long now) {
@@ -136,15 +130,6 @@ public class App extends Application {
                 calcVisible();
                 calcNodes();
                 calcGridSize();
-
-                if (reset) {
-                    reset = reset();
-                } else {
-                    handleInput();
-                }
-                grid.logic(options.getWindStrength().getValue(), options.getWindDirection().getValue());
-
-                pane.drawGrid();
             }
 
             private void calcFrames(long now) {
@@ -176,70 +161,6 @@ public class App extends Application {
             private void calcGridSize() {
                 widthProp.set(grid.getGrid().length);
                 heightProp.set(grid.getGrid()[0].length);
-            }
-
-            private boolean reset() {
-                if (resetCount > 60 * 7) {
-                    grid.clear();
-                    resetCount = 0;
-                    return false;
-                }
-                int existing = 0;
-                for (int i = 0; i < grid.getWidth(); i++) {
-                    for (int j = 0; j < grid.getHeight(); j++) {
-                        if (grid.getGrid()[i][j].exists) {
-                            existing++;
-                            if (Math.random() < .02) {
-                                grid.remove(i, j);
-                            }
-                        }
-                    }
-                }
-                if (existing > (0)) {
-                    resetCount++;
-                    return true;
-                } else {
-                    resetCount = 0;
-                    return false;
-                }
-            }
-
-            private void handleInput() {
-                if (auto) {
-                    auto();
-                }
-                if (pane.isMousePressed()) {
-                    addToGrid(pane.getMousePos(), options.getSandColor(), options.getParticleType());
-                }
-            }
-
-            private void auto() {
-                color = colorList.get(random.nextInt(colorList.size()));
-                grid.addToGrid((int) (Math.random() * grid.getWidth()), 0, color, "Sand");
-
-                int count = 0;
-                for (int i = 0; i < grid.getGrid().length; i++) {
-                    if (grid.getGrid()[i][0].exists == true) {
-                        count++;
-                        if (count > grid.getWidth() / (grid.getWidth() / 2)) {
-                            reset = true;
-                            colorList = Palette.getColorList().get(random.nextInt(Palette.getColorList().size()));
-                        }
-                    }
-                }
-
-            }
-
-            private void addToGrid(Point2D position, Color color, String type) {
-                double x = position.getX() - (position.getX() % pane.getUnit());
-                double y = position.getY() - (position.getY() % pane.getUnit());
-
-                if (x >= 0 && x < (grid.getWidth() * pane.getUnit()) && y >= 0
-                        && y < (grid.getHeight() * pane.getUnit())) {
-                    int gridX = (int) (x / pane.getUnit());
-                    int gridY = (int) (y / pane.getUnit());
-                    grid.addToGrid(gridX, gridY, color, type);
-                }
             }
 
         };
