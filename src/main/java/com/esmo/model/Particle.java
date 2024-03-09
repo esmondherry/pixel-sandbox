@@ -3,6 +3,31 @@ package com.esmo.model;
 import javafx.scene.paint.Color;
 
 public abstract class Particle {
+    public enum ParticleType {
+        Sand, Water, Air
+    }
+
+    private Color color;
+    protected int x;
+    protected int y;
+    public boolean exists;
+
+    public Particle(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public abstract void logic(Particle[][] grid, Particle[][] tmpgrid, double windStrength,
+            double windDirection);
+
     protected boolean fallDown(Particle[][] grid, Particle[][] tmpgrid) {
         if (y < grid[0].length - 1 && tmpgrid[x][y].exists == true && tmpgrid[x][y + 1].exists == false
                 && grid[x][y + 1].exists == false) {
@@ -60,29 +85,4 @@ public abstract class Particle {
         }
         return false;
     }
-
-    private Color color;
-
-    protected int x;
-
-    protected int y;
-
-    public boolean exists;
-
-    public Particle(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    public abstract void logic(Particle[][] grid, Particle[][] tmpgrid, double windStrength,
-            double windDirection);
-
 }

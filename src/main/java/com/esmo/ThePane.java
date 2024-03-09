@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.esmo.model.Grid;
 import com.esmo.model.Particle;
+import com.esmo.model.Particle.ParticleType;
 import com.esmo.utils.Palette;
 import com.esmo.view.Options;
 
@@ -137,11 +138,11 @@ public class ThePane extends Pane {
                 if (autoSpeed < 1) {
                     int speed = (int) (1 / autoSpeed);
                     if (frameCount % speed == 0) {
-                        grid.addToGrid(random.nextInt(grid.getWidth()), 0, color, "Sand");
+                        grid.addToGrid(random.nextInt(grid.getWidth()), 0, color, ParticleType.Sand);
                     }
                 } else {
                     for (int i = 0; i < autoSpeed; i++) {
-                        grid.addToGrid(random.nextInt(grid.getWidth()), 0, color, "Sand");
+                        grid.addToGrid(random.nextInt(grid.getWidth()), 0, color, ParticleType.Sand);
                     }
 
                 }
@@ -159,7 +160,7 @@ public class ThePane extends Pane {
 
             }
 
-            private void addToGrid(Point2D position, Color color, String type) {
+            private void addToGrid(Point2D position, Color color, ParticleType type) {
                 double x = position.getX() - (position.getX() % getUnit());
                 double y = position.getY() - (position.getY() % getUnit());
 

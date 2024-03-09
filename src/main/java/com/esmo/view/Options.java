@@ -1,5 +1,7 @@
 package com.esmo.view;
 
+import com.esmo.model.Particle.ParticleType;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -19,7 +21,7 @@ public class Options extends ScrollPane {
     private ColorPicker sandColor;
     private Button reset;
     private CheckBox auto;
-    private ComboBox<String> particleType;
+    private ComboBox<ParticleType> particleType;
     private CheckBox onTop;
     private Button clear;
 
@@ -45,7 +47,7 @@ public class Options extends ScrollPane {
         windStrength.setShowTickMarks(true);
 
         particleType = new ComboBox<>();
-        particleType.getItems().addAll("Sand", "Water");
+        particleType.getItems().addAll(ParticleType.Sand, ParticleType.Water);
         particleType.getSelectionModel().selectFirst();
 
         windStrength.setMajorTickUnit(.50);
@@ -85,11 +87,11 @@ public class Options extends ScrollPane {
         return auto;
     }
 
-    public String getParticleType() {
+    public ParticleType getParticleType() {
         return particleType.getSelectionModel().getSelectedItem();
     }
 
-    public void setParticleType(String type) {
+    public void setParticleType(ParticleType type) {
         particleType.getSelectionModel().select(type);
     }
 }

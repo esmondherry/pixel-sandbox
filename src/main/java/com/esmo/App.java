@@ -6,7 +6,7 @@ import java.util.Random;
 
 import com.esmo.model.Grid;
 import com.esmo.model.Particle;
-import com.esmo.utils.Palette;
+import com.esmo.model.Particle.ParticleType;
 import com.esmo.view.Hud;
 import com.esmo.view.Options;
 
@@ -109,10 +109,10 @@ public class App extends Application {
                     pane.setAuto(auto);
                     break;
                 case DIGIT1:
-                    options.setParticleType("Sand");
+                    options.setParticleType(ParticleType.Sand);
                     break;
                 case DIGIT2:
-                    options.setParticleType("Water");
+                    options.setParticleType(ParticleType.Water);
                     break;
                 default:
                     break;

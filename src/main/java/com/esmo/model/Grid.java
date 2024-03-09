@@ -1,5 +1,7 @@
 package com.esmo.model;
 
+import com.esmo.model.Particle.ParticleType;
+
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
@@ -27,22 +29,27 @@ public class Grid {
         }
     }
 
-    public void addToGrid(int x, int y, Color color, String type) {
+    public void addToGrid(int x, int y, Color color, ParticleType type) {
         if (x >= 0 && x < (grid.length) && y >= 0 && y < (grid[0].length)) {
+            Particle particle;
             switch (type) {
-                case "Sand":
-                    grid[x][y] = new Sand(x, y);
+                case Sand:
+                    particle = new Sand(x, y);
                     break;
-                case "Water":
-                    grid[x][y] = new Water(x, y);
+                case Water:
+                    particle = new Water(x, y);
                     break;
+                default:
+                    particle = new Air(x, y);
+
             }
-            grid[x][y].exists = true;
-            grid[x][y].setColor(color);
+            particle.exists = true;
+            particle.setColor(color);
+            grid[x][y] = particle;
         }
     }
 
-    public void addToGrid(Point2D position, Color color, String type) {
+    public void addToGrid(Point2D position, Color color, ParticleType type) {
         int x = (int) position.getX();
         int y = (int) position.getY();
         addToGrid(x, y, color, type);
