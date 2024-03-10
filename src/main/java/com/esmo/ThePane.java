@@ -25,26 +25,10 @@ public class ThePane extends Pane {
     private Grid grid;
     private boolean reset;
     private Options options;
-
-    public void setReset(boolean reset) {
-        this.reset = reset;
-    }
-
     private Canvas canvas;
     private GraphicsContext gc;
-    protected boolean auto;
     private double autoSpeed;
-
-    public void setAutoSpeed(double autoSpeed) {
-        if (autoSpeed < 0) {
-            autoSpeed = 0;
-        }
-        this.autoSpeed = autoSpeed;
-    }
-
-    public void setAuto(boolean auto) {
-        this.auto = auto;
-    }
+    private boolean auto;
 
     public ThePane(Grid grid, double unit, Options options) {
         this.grid = grid;
@@ -73,6 +57,21 @@ public class ThePane extends Pane {
         updateCanvasSize();
 
         animationTimer().start();
+    }
+
+    public void setReset(boolean reset) {
+        this.reset = reset;
+    }
+
+    public void setAutoSpeed(double autoSpeed) {
+        if (autoSpeed < 0) {
+            autoSpeed = 0;
+        }
+        this.autoSpeed = autoSpeed;
+    }
+
+    public void setAuto(boolean auto) {
+        this.auto = auto;
     }
 
     private AnimationTimer animationTimer() {
@@ -107,7 +106,7 @@ public class ThePane extends Pane {
                 int existing = 0;
                 for (int i = 0; i < grid.getWidth(); i++) {
                     for (int j = 0; j < grid.getHeight(); j++) {
-                        if (grid.getGrid()[i][j].exists) {
+                        if (grid.getGrid()[i][j]!=null) {
                             existing++;
                             if (Math.random() < .02) {
                                 grid.remove(i, j);
@@ -149,7 +148,7 @@ public class ThePane extends Pane {
 
                 int count = 0;
                 for (int i = 0; i < grid.getGrid().length; i++) {
-                    if (grid.getGrid()[i][0].exists == true) {
+                    if (grid.getGrid()[i][0]!=null == true) {
                         count++;
                         if (count > grid.getWidth() / 2) {
                             reset = true;

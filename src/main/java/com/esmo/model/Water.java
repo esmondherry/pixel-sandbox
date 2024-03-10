@@ -36,13 +36,13 @@ public class Water extends Particle {
         for (int i = 1; i <= x; i++) {
 
             if (y < grid[0].length - 1 && x > 0) {
-                if (!(grid[x - i][y + 1] instanceof Water || grid[x - i][y + 1] instanceof Air)) {
+                if (!(grid[x - i][y + 1] instanceof Water || grid[x - i][y + 1] ==null)) {
                     return false;
                 }
-                if (tmpgrid[x][y].exists == true && tmpgrid[x - i][y + 1].exists == false
-                        && grid[x - i][y + 1].exists == false) {
+                if (tmpgrid[x][y]!=null == true && tmpgrid[x - i][y + 1]!=null == false
+                        && grid[x - i][y + 1]!=null == false) {
                     grid[x - i][y + 1] = grid[x][y];
-                    grid[x][y] = new Air(x, y);
+                    grid[x][y] = null;
                     x-=i;
                     y++;
                     return true;
@@ -56,13 +56,13 @@ public class Water extends Particle {
     public boolean warpDownRight(Particle[][] grid, Particle[][] tmpgrid) {
         for (int i = 1; i <= grid.length - x; i++) {
             if (y < grid[0].length - 1 && x + i < grid.length) {
-                if (!(grid[x + i][y + 1] instanceof Water || grid[x + i][y + 1] instanceof Air)) {
+                if (!(grid[x + i][y + 1] instanceof Water || grid[x + i][y + 1] ==null)) {
                     return false;
                 }
-                if (tmpgrid[x][y].exists == true &&
-                        tmpgrid[x + i][y + 1].exists == false && grid[x + i][y + 1].exists == false) {
+                if (tmpgrid[x][y]!=null == true &&
+                        tmpgrid[x + i][y + 1]!=null == false && grid[x + i][y + 1]!=null == false) {
                     grid[x + i][y + 1] = grid[x][y];
-                    grid[x][y] = new Air(x, y);
+                    grid[x][y] = null;
                     x+=i;
                     y++;
                     return true;

@@ -4,7 +4,7 @@ import javafx.scene.paint.Color;
 
 public abstract class Particle {
     public enum ParticleType {
-        Sand, Water, Air
+        Sand, Water, None
     }
 
     private Color color;
@@ -29,10 +29,10 @@ public abstract class Particle {
             double windDirection);
 
     protected boolean fallDown(Particle[][] grid, Particle[][] tmpgrid) {
-        if (y < grid[0].length - 1 && tmpgrid[x][y].exists == true && tmpgrid[x][y + 1].exists == false
-                && grid[x][y + 1].exists == false) {
+        if (y < grid[0].length - 1 && tmpgrid[x][y]!=null == true && tmpgrid[x][y + 1]!=null == false
+                && grid[x][y + 1]!=null == false) {
             grid[x][y + 1] = grid[x][y];
-            grid[x][y] = new Air(x, y);
+            grid[x][y] = null;
             y++;
             return true;
         }
@@ -40,10 +40,10 @@ public abstract class Particle {
     }
 
     protected boolean fallLeft(Particle[][] grid, Particle[][] tmpgrid) {
-        if (y < grid[0].length - 1 && x != 0 && tmpgrid[x][y].exists == true && tmpgrid[x - 1][y + 1].exists == false
-                && grid[x - 1][y + 1].exists == false) {
+        if (y < grid[0].length - 1 && x != 0 && tmpgrid[x][y]!=null == true && tmpgrid[x - 1][y + 1]!=null == false
+                && grid[x - 1][y + 1]!=null == false) {
             grid[x - 1][y + 1] = grid[x][y];
-            grid[x][y] = new Air(x, y);
+            grid[x][y] = null;
             x--;
             y++;
             return true;
@@ -52,11 +52,11 @@ public abstract class Particle {
     }
 
     protected boolean fallRight(Particle[][] grid, Particle[][] tmpgrid) {
-        if (y < grid[0].length - 1 && x != grid.length - 1 && tmpgrid[x][y].exists == true
-                && tmpgrid[x + 1][y + 1].exists == false
-                && grid[x + 1][y + 1].exists == false) {
+        if (y < grid[0].length - 1 && x != grid.length - 1 && tmpgrid[x][y]!=null == true
+                && tmpgrid[x + 1][y + 1]!=null == false
+                && grid[x + 1][y + 1]!=null == false) {
             grid[x + 1][y + 1] = grid[x][y];
-            grid[x][y] = new Air(x, y);
+            grid[x][y] = null;
             x++;
             y++;
             return true;
@@ -65,10 +65,10 @@ public abstract class Particle {
     }
 
     protected boolean moveLeft(Particle[][] grid, Particle[][] tmpgrid) {
-        if (x != 0 && tmpgrid[x][y].exists == true && tmpgrid[x - 1][y].exists == false
-                && grid[x - 1][y].exists == false) {
+        if (x != 0 && tmpgrid[x][y]!=null == true && tmpgrid[x - 1][y]!=null == false
+                && grid[x - 1][y]!=null == false) {
             grid[x - 1][y] = grid[x][y];
-            grid[x][y] = new Air(x, y);
+            grid[x][y] = null;
             x--;
             return true;
         }
@@ -76,10 +76,10 @@ public abstract class Particle {
     }
 
     protected boolean moveRight(Particle[][] grid, Particle[][] tmpgrid) {
-        if (x != grid.length - 1 && tmpgrid[x][y].exists == true && tmpgrid[x + 1][y].exists == false
-                && grid[x + 1][y].exists == false) {
+        if (x != grid.length - 1 && tmpgrid[x][y]!=null == true && tmpgrid[x + 1][y]!=null == false
+                && grid[x + 1][y]!=null == false) {
             grid[x + 1][y] = grid[x][y];
-            grid[x][y] = new Air(x, y);
+            grid[x][y] = null;
             x++;
             return true;
         }

@@ -22,11 +22,6 @@ public class Grid {
 
     private void intGrid() {
         grid = new Particle[width][height];
-        for (int x = 0; x < grid.length; x++) {
-            for (int y = 0; y < grid[0].length; y++) {
-                grid[x][y] = new Air(x, y);
-            }
-        }
     }
 
     public void addToGrid(int x, int y, Color color, ParticleType type) {
@@ -40,7 +35,7 @@ public class Grid {
                     particle = new Water(x, y);
                     break;
                 default:
-                    particle = new Air(x, y);
+                    return;
 
             }
             particle.exists = true;
@@ -70,7 +65,7 @@ public class Grid {
                 try {
                     newGrid[x][y] = grid[x][y];
                 } catch (Exception e) {
-                    newGrid[x][y] = new Air(x, y);
+                    newGrid[x][y] = null;
                 }
 
             }
@@ -107,7 +102,8 @@ public class Grid {
     }
 
     public void remove(int x, int y) {
-        grid[x][y] = new Air(x, y);
+        particles.remove(grid[x][y]);
+        grid[x][y] = null;
     }
 
     public int getWidth() {

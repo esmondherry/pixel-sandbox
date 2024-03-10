@@ -148,7 +148,7 @@ public class App extends Application {
                 Particle[][] particleGrid = grid.getGrid();
                 for (int x = 0; x < particleGrid.length; x++) {
                     for (int y = 0; y < particleGrid[0].length; y++) {
-                        if (particleGrid[x][y].exists) {
+                        if (particleGrid[x][y]!=null) {
                             visibleCount++;
                         }
                     }
