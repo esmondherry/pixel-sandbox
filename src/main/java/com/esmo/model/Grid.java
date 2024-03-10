@@ -70,11 +70,7 @@ public class Grid {
             return;
         }
 
-        width = newWidth;
-        height = newHeight;
-
         Particle newGrid[][] = new Particle[newWidth][newHeight];
-
         for (int x = 0; x < newGrid.length; x++) {
             for (int y = 0; y < newGrid[0].length; y++) {
                 try {
@@ -85,6 +81,23 @@ public class Grid {
 
             }
         }
+        if (newWidth < width) {
+            for (int x = newWidth; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    remove(x, y);
+                }
+            }
+        }
+        if (newHeight < height) {
+            for (int x = 0; x < width; x++) {
+                for (int y = newHeight; y < height; y++) {
+                    remove(x, y);
+                }
+            }
+        }
+
+        this.width = newWidth;
+        this.height = newHeight;
         this.grid = newGrid;
     }
 
