@@ -1,6 +1,7 @@
 package com.esmo.model;
 
 import com.esmo.model.Particle.ParticleType;
+import java.util.*;
 
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -9,6 +10,7 @@ public class Grid {
     private Particle grid[][];
     private int width;
     private int height;
+    private Set<Particle> particles;
 
     public Grid(int width, int height) {
         this.width = width;
@@ -22,6 +24,7 @@ public class Grid {
 
     private void intGrid() {
         grid = new Particle[width][height];
+        particles = new HashSet<>();
     }
 
     public void addToGrid(int x, int y, Color color, ParticleType type) {
@@ -44,9 +47,15 @@ public class Grid {
                     return;
 
             }
-            particle.exists = true;
-            particle.setColor(color);
-            grid[x][y] = particle;
+            if (particles.contains(grid[x][y])) {
+                // particles.remove(grid[x][y]);
+                // grid[x][y] = particle;
+                // particles.add(particle);
+            } else {
+                particle.setColor(color);
+                grid[x][y] = particle;
+                particles.add(particle);
+            }
         }
     }
 
@@ -88,18 +97,8 @@ public class Grid {
                 tmpgrid[i][j] = grid[i][j];
             }
         }
-        for (int y = 0; y < height; y++) {
-            if (y % 2 == 0) {
-                for (int x = 0; x < width; x++) {
-                    grid[x][y].logic(grid, tmpgrid, windStrength,
-                            windDirection);
-                }
-            } else {
-                for (int x = width - 1; x >= 0; x--) {
-                    grid[x][y].logic(grid, tmpgrid, windStrength,
-                            windDirection);
-                }
-            }
+        for (Particle particle : particles) {
+            particle.logic(grid, tmpgrid, windStrength, windDirection);
         }
     }
 
@@ -118,5 +117,9 @@ public class Grid {
 
     public int getHeight() {
         return height;
+    }
+
+    public Set<Particle> getParticles() {
+        return particles;
     }
 }

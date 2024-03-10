@@ -74,6 +74,14 @@ public class ThePane extends Pane {
         this.auto = auto;
     }
 
+    public void drawGrid() {
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        for (Particle particle : grid.getParticles()) {
+            gc.setFill(particle.getColor());
+            gc.fillRect(particle.getX() * unit, particle.getY() * unit, unit, unit);
+        }
+    }
+
     private AnimationTimer animationTimer() {
         return new AnimationTimer() {
             private int resetCount = 0;
@@ -199,19 +207,6 @@ public class ThePane extends Pane {
 
     public Point2D getMousePos() {
         return mousePos;
-    }
-
-    public void drawGrid() {
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        Particle[][] particleGrid = grid.getGrid();
-        for (int x = 0; x < particleGrid.length; x++) {
-            for (int y = 0; y < particleGrid[0].length; y++) {
-                if (particleGrid[x][y].exists) {
-                    gc.setFill(particleGrid[x][y].getColor());
-                    gc.fillRect(x * unit, y * unit, unit, unit);
-                }
-            }
-        }
     }
 
     private void handleMousePressed(MouseEvent e) {

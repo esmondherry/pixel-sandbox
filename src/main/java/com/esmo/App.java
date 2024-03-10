@@ -29,9 +29,10 @@ public class App extends Application {
     private SimpleIntegerProperty nodes = new SimpleIntegerProperty(0);
     private SimpleIntegerProperty heightProp = new SimpleIntegerProperty(0);
     private SimpleIntegerProperty widthProp = new SimpleIntegerProperty(0);
+    private SimpleIntegerProperty listSize =  new SimpleIntegerProperty(0);
     final private int width = 90;
     final private int height = 45;
-    final private double unit = 10;
+    final private double unit = 2;
     private Grid grid;
 
     @Override
@@ -44,12 +45,14 @@ public class App extends Application {
         Hud hud = new Hud();
         hud.addItem("fps", fps);
         hud.addItem("visible", visible);
+        hud.addItem("list lenght", listSize);
         hud.addItem("nodes", nodes);
         hud.addItem("h", heightProp);
         hud.addItem("w", widthProp);
+        hud.setTextColor(Color.WHITE);
 
         ThePane pane = new ThePane(grid, unit, options);
-
+        pane.setAutoSpeed(30);
         Button optionsButton = new Button("⚙");
 
         BorderPane borderPane = new BorderPane();
@@ -134,6 +137,11 @@ public class App extends Application {
                 calcVisible();
                 calcNodes();
                 calcGridSize();
+                listSize();
+            }
+
+            private void listSize() {
+                listSize.set(grid.getParticles().size());
             }
 
             private void calcFrames(long now) {

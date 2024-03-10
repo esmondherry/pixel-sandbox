@@ -10,11 +10,18 @@ public abstract class Particle {
     private Color color;
     protected int x;
     protected int y;
-    public boolean exists;
 
     public Particle(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 
     public Color getColor() {
@@ -28,9 +35,23 @@ public abstract class Particle {
     public abstract void logic(Particle[][] grid, Particle[][] tmpgrid, double windStrength,
             double windDirection);
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Particle)) {
+            return false;
+        }
+        Particle other = (Particle) obj;
+        if (other.getX() == this.getX() && other.getY() == this.getY() && other.getColor() == this.getColor()) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
     protected boolean fallDown(Particle[][] grid, Particle[][] tmpgrid) {
-        if (y < grid[0].length - 1 && tmpgrid[x][y]!=null == true && tmpgrid[x][y + 1]!=null == false
-                && grid[x][y + 1]!=null == false) {
+        if (y < grid[0].length - 1 && tmpgrid[x][y] != null == true && tmpgrid[x][y + 1] != null == false
+                && grid[x][y + 1] != null == false) {
             grid[x][y + 1] = grid[x][y];
             grid[x][y] = null;
             y++;
@@ -40,8 +61,8 @@ public abstract class Particle {
     }
 
     protected boolean fallLeft(Particle[][] grid, Particle[][] tmpgrid) {
-        if (y < grid[0].length - 1 && x != 0 && tmpgrid[x][y]!=null == true && tmpgrid[x - 1][y + 1]!=null == false
-                && grid[x - 1][y + 1]!=null == false) {
+        if (y < grid[0].length - 1 && x != 0 && tmpgrid[x][y] != null == true && tmpgrid[x - 1][y + 1] != null == false
+                && grid[x - 1][y + 1] != null == false) {
             grid[x - 1][y + 1] = grid[x][y];
             grid[x][y] = null;
             x--;
@@ -52,9 +73,9 @@ public abstract class Particle {
     }
 
     protected boolean fallRight(Particle[][] grid, Particle[][] tmpgrid) {
-        if (y < grid[0].length - 1 && x != grid.length - 1 && tmpgrid[x][y]!=null == true
-                && tmpgrid[x + 1][y + 1]!=null == false
-                && grid[x + 1][y + 1]!=null == false) {
+        if (y < grid[0].length - 1 && x != grid.length - 1 && tmpgrid[x][y] != null == true
+                && tmpgrid[x + 1][y + 1] != null == false
+                && grid[x + 1][y + 1] != null == false) {
             grid[x + 1][y + 1] = grid[x][y];
             grid[x][y] = null;
             x++;
@@ -65,8 +86,8 @@ public abstract class Particle {
     }
 
     protected boolean moveLeft(Particle[][] grid, Particle[][] tmpgrid) {
-        if (x != 0 && tmpgrid[x][y]!=null == true && tmpgrid[x - 1][y]!=null == false
-                && grid[x - 1][y]!=null == false) {
+        if (x != 0 && tmpgrid[x][y] != null == true && tmpgrid[x - 1][y] != null == false
+                && grid[x - 1][y] != null == false) {
             grid[x - 1][y] = grid[x][y];
             grid[x][y] = null;
             x--;
@@ -76,8 +97,8 @@ public abstract class Particle {
     }
 
     protected boolean moveRight(Particle[][] grid, Particle[][] tmpgrid) {
-        if (x != grid.length - 1 && tmpgrid[x][y]!=null == true && tmpgrid[x + 1][y]!=null == false
-                && grid[x + 1][y]!=null == false) {
+        if (x != grid.length - 1 && tmpgrid[x][y] != null == true && tmpgrid[x + 1][y] != null == false
+                && grid[x + 1][y] != null == false) {
             grid[x + 1][y] = grid[x][y];
             grid[x][y] = null;
             x++;
