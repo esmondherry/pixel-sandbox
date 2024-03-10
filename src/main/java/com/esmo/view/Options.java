@@ -47,7 +47,7 @@ public class Options extends ScrollPane {
         windStrength.setShowTickMarks(true);
 
         particleType = new ComboBox<>();
-        particleType.getItems().addAll(ParticleType.Sand, ParticleType.Water);
+        particleType.getItems().addAll(ParticleType.values());
         particleType.getSelectionModel().selectFirst();
 
         windStrength.setMajorTickUnit(.50);

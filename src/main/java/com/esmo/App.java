@@ -1,9 +1,6 @@
 package com.esmo;
 
 //45_000@60
-import java.util.ArrayList;
-import java.util.Random;
-
 import com.esmo.model.Grid;
 import com.esmo.model.Particle;
 import com.esmo.model.Particle.ParticleType;
@@ -13,7 +10,6 @@ import com.esmo.view.Options;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -113,6 +109,12 @@ public class App extends Application {
                     break;
                 case DIGIT2:
                     options.setParticleType(ParticleType.Water);
+                    break;
+                case DIGIT3:
+                    options.setParticleType(ParticleType.Rock);
+                    break;
+                case DIGIT0:
+                    options.setParticleType(ParticleType.None);
                     break;
                 default:
                     break;

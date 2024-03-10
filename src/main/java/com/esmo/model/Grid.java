@@ -34,6 +34,12 @@ public class Grid {
                 case Water:
                     particle = new Water(x, y);
                     break;
+                case Rock:
+                    particle = new Rock(x, y);
+                    break;
+                case None:
+                    remove(x, y);
+                    return;
                 default:
                     return;
 

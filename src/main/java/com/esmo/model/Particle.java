@@ -4,7 +4,7 @@ import javafx.scene.paint.Color;
 
 public abstract class Particle {
     public enum ParticleType {
-        Sand, Water, None
+        Sand, Water, Rock, None
     }
 
     private Color color;
