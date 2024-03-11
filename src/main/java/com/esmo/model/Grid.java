@@ -48,14 +48,11 @@ public class Grid {
 
             }
             if (particles.contains(grid[x][y])) {
-                // particles.remove(grid[x][y]);
-                // grid[x][y] = particle;
-                // particles.add(particle);
-            } else {
-                particle.setColor(color);
-                grid[x][y] = particle;
-                particles.add(particle);
+                remove(x, y);
             }
+            particle.setColor(color);
+            grid[x][y] = particle;
+            particles.add(particle);
         }
     }
 
