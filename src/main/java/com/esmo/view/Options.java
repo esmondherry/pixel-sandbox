@@ -24,14 +24,7 @@ public class Options extends ScrollPane {
     private ComboBox<ParticleType> particleType;
     private CheckBox onTop;
     private Button clear;
-
-    public Button getClear() {
-        return clear;
-    }
-
-    public CheckBox getOnTop() {
-        return onTop;
-    }
+    private Button physicsToggle;
 
     public Options() {
         VBox vBox = new VBox();
@@ -61,10 +54,24 @@ public class Options extends ScrollPane {
 
         onTop = new CheckBox("Always On Top");
 
+        physicsToggle = new Button("Pause");
+        
         vBox.getChildren().addAll(new Label("Direction"), windDirection, new Label("Strength"), windStrength,
                 new Label("Type"), particleType,
-                new Label("Sand Color"), sandColor, auto, new HBox(reset, clear), new Separator(), onTop);
+                new Label("Sand Color"), sandColor, auto, new HBox(reset, clear), new Separator(), onTop,new Separator(),physicsToggle);
         setContent(vBox);
+    }
+
+    public Button getPhysicsToggle() {
+        return physicsToggle;
+    }
+
+    public Button getClear() {
+        return clear;
+    }
+
+    public CheckBox getOnTop() {
+        return onTop;
     }
 
     public Slider getWindDirection() {

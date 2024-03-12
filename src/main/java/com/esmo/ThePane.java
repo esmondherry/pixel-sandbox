@@ -29,6 +29,8 @@ public class ThePane extends Pane {
     private GraphicsContext gc;
     private double autoSpeed;
     private boolean auto;
+    private AnimationTimer animationTimer;
+    private boolean physics;
 
     public ThePane(Grid grid, double unit, Options options) {
         this.grid = grid;
@@ -39,6 +41,7 @@ public class ThePane extends Pane {
         this.mousePressed = false;
         this.options = options;
         this.autoSpeed = 1;
+        this.physics = true;
 
         setStyle("-fx-background-color: #404040;");
         setPrefWidth(grid.getWidth() * unit);
@@ -56,7 +59,8 @@ public class ThePane extends Pane {
         getChildren().add(canvas);
         updateCanvasSize();
 
-        animationTimer().start();
+        animationTimer = animationTimer();
+        animationTimer.start();
     }
 
     public void setReset(boolean reset) {
@@ -82,6 +86,26 @@ public class ThePane extends Pane {
         }
     }
 
+    public boolean isMousePressed() {
+        return mousePressed;
+    }
+
+    public double getUnit() {
+        return unit;
+    }
+
+    public void setUnit(double unit) {
+        this.unit = unit;
+    }
+
+    public Point2D getMousePos() {
+        return mousePos;
+    }
+
+    public void setRunning(boolean run) {
+        this.physics = run;
+    }
+
     private AnimationTimer animationTimer() {
         return new AnimationTimer() {
             private int resetCount = 0;
@@ -89,6 +113,8 @@ public class ThePane extends Pane {
             private Random random = new Random();
             private ArrayList<Color> colorList = Palette.getColorList()
                     .get(random.nextInt(Palette.getColorList().size()));
+            private long lastTime = 0;
+            private int frameCount = 0;
 
             @Override
             public void handle(long now) {
@@ -96,10 +122,17 @@ public class ThePane extends Pane {
                 if (reset) {
                     reset = reset();
                 } else {
-                    handleInput();
+                    if (auto && physics) {
+                        auto();
+                    }
+                    if (isMousePressed()) {
+                        addToGrid(getMousePos(), options.getSandColor(), options.getParticleType());
+                    }
                 }
-                grid.logic(options.getWindStrength().getValue(),
-                        options.getWindDirection().getValue());
+                if (physics) {
+                    grid.logic(options.getWindStrength().getValue(),
+                            options.getWindDirection().getValue());
+                }
 
                 drawGrid();
 
@@ -114,7 +147,7 @@ public class ThePane extends Pane {
                 int existing = 0;
                 for (int i = 0; i < grid.getWidth(); i++) {
                     for (int j = 0; j < grid.getHeight(); j++) {
-                        if (grid.getGrid()[i][j]!=null) {
+                        if (grid.getGrid()[i][j] != null) {
                             existing++;
                             if (Math.random() < .02) {
                                 grid.remove(i, j);
@@ -128,15 +161,6 @@ public class ThePane extends Pane {
                 } else {
                     resetCount = 0;
                     return false;
-                }
-            }
-
-            private void handleInput() {
-                if (auto) {
-                    auto();
-                }
-                if (isMousePressed()) {
-                    addToGrid(getMousePos(), options.getSandColor(), options.getParticleType());
                 }
             }
 
@@ -156,7 +180,7 @@ public class ThePane extends Pane {
 
                 int count = 0;
                 for (int i = 0; i < grid.getGrid().length; i++) {
-                    if (grid.getGrid()[i][0]!=null == true) {
+                    if (grid.getGrid()[i][0] != null == true) {
                         count++;
                         if (count > grid.getWidth() / 2) {
                             reset = true;
@@ -179,9 +203,6 @@ public class ThePane extends Pane {
                 }
             }
 
-            private long lastTime = 0;
-            private int frameCount = 0;
-
             private void calcFrames(long now) {
                 frameCount++;
                 if (now - lastTime >= App.ONE_SECOND) {
@@ -191,22 +212,6 @@ public class ThePane extends Pane {
             }
 
         };
-    }
-
-    public boolean isMousePressed() {
-        return mousePressed;
-    }
-
-    public double getUnit() {
-        return unit;
-    }
-
-    public void setUnit(double unit) {
-        this.unit = unit;
-    }
-
-    public Point2D getMousePos() {
-        return mousePos;
     }
 
     private void handleMousePressed(MouseEvent e) {

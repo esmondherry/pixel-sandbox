@@ -29,10 +29,10 @@ public class App extends Application {
     private SimpleIntegerProperty nodes = new SimpleIntegerProperty(0);
     private SimpleIntegerProperty heightProp = new SimpleIntegerProperty(0);
     private SimpleIntegerProperty widthProp = new SimpleIntegerProperty(0);
-    private SimpleIntegerProperty listSize =  new SimpleIntegerProperty(0);
+    private SimpleIntegerProperty listSize = new SimpleIntegerProperty(0);
     final private int width = 90;
     final private int height = 45;
-    final private double unit = 2;
+    final private double unit = 3;
     private Grid grid;
 
     @Override
@@ -80,6 +80,15 @@ public class App extends Application {
         });
         options.getClear().setOnAction(e -> {
             grid.clear();
+        });
+        options.getPhysicsToggle().setOnAction(e -> {
+            boolean pause = options.getPhysicsToggle().getText().equals("Pause");
+            if (pause) {
+                options.getPhysicsToggle().setText("Play");
+            } else {
+                options.getPhysicsToggle().setText("Pause");
+            }
+            pane.setRunning(!pause);
         });
         optionsButton.setOnAction(event -> {
             if (stackPane.getChildren().contains(borderPane)) {
@@ -158,7 +167,7 @@ public class App extends Application {
                 Particle[][] particleGrid = grid.getGrid();
                 for (int x = 0; x < particleGrid.length; x++) {
                     for (int y = 0; y < particleGrid[0].length; y++) {
-                        if (particleGrid[x][y]!=null) {
+                        if (particleGrid[x][y] != null) {
                             visibleCount++;
                         }
                     }
