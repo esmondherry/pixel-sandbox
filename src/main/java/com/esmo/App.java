@@ -1,200 +1,173 @@
 package com.esmo;
 
-//45_000@60
-import com.esmo.model.Grid;
-import com.esmo.model.Particle;
-import com.esmo.model.Particle.ParticleType;
-import com.esmo.view.Hud;
-import com.esmo.view.Options;
-
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class App extends Application {
+    private static final int WIDTH = 640;
+    private static final int HEIGHT = 480;
+    private static final int PIXEL_SIZE = 2;
 
-    static int ONE_SECOND = 1_000_000_000;
-
-    private SimpleIntegerProperty fps = new SimpleIntegerProperty(0);
-    private SimpleIntegerProperty visible = new SimpleIntegerProperty(0);
-    private SimpleIntegerProperty nodes = new SimpleIntegerProperty(0);
-    private SimpleIntegerProperty heightProp = new SimpleIntegerProperty(0);
-    private SimpleIntegerProperty widthProp = new SimpleIntegerProperty(0);
-    private SimpleIntegerProperty listSize = new SimpleIntegerProperty(0);
-    final private int width = 90;
-    final private int height = 45;
-    final private double unit = 3;
-    private Grid grid;
+    private boolean isMousePressed = false;
+    private double mouseX, mouseY;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        grid = new Grid(width, height);
-        Options options = new Options();
-        options.setMaxWidth(155);
-        StackPane.setAlignment(options, Pos.CENTER_RIGHT);
+        WindController windController = new WindController();
 
-        Hud hud = new Hud();
-        hud.addItem("fps", fps);
-        hud.addItem("visible", visible);
-        hud.addItem("list lenght", listSize);
-        hud.addItem("nodes", nodes);
-        hud.addItem("h", heightProp);
-        hud.addItem("w", widthProp);
-        hud.setTextColor(Color.WHITE);
+        AppState state = new AppState();
+        Field field = new Field(WIDTH, HEIGHT);
+        VBox controls = new Controls(state, field);
 
-        ThePane pane = new ThePane(grid, unit, options);
-        pane.setAutoSpeed(30);
-        Button optionsButton = new Button("⚙");
+        Label windLabel = new Label();
+        Label toolLabel = new Label();
+        Label brushLabel = new Label();
+        Label particleCountLabel = new Label();
+        Label frameTimeLabel = new Label();
 
-        BorderPane borderPane = new BorderPane();
-        borderPane.setLeft(optionsButton);
-        borderPane.setCenter(options);
+        VBox hud = new VBox(4, windLabel, toolLabel, brushLabel, particleCountLabel, frameTimeLabel);
+        hud.setTranslateX(10);
+        hud.setTranslateY(10);
+        hud.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5); -fx-padding: 8px;");
+        hud.setMouseTransparent(true);
 
-        borderPane.setMaxWidth(180);
-        borderPane.setOnMouseEntered(e -> makeSolid(e));
-        borderPane.setOnMouseExited(e -> makeTransparent(e));
-        StackPane.setAlignment(borderPane, Pos.CENTER_RIGHT);
-
-        StackPane stackPane = new StackPane();
-        StackPane.setAlignment(hud, Pos.TOP_LEFT);
-        StackPane.setAlignment(optionsButton, Pos.TOP_RIGHT);
-        stackPane.getChildren().addAll(pane, hud, optionsButton);
-
-        options.getReset().setOnAction(e -> {
-            pane.setReset(true);
+        Canvas canvas = new Canvas(WIDTH * PIXEL_SIZE, HEIGHT * PIXEL_SIZE);
+        canvas.setOnMousePressed(e -> isMousePressed = true);
+        canvas.setOnMouseReleased(e -> isMousePressed = false);
+        canvas.setOnMouseDragged(e -> {
+            mouseX = e.getX();
+            mouseY = e.getY();
         });
-        options.getAuto().setOnAction(e -> {
-            pane.setAuto(options.getAuto().isSelected());
-        });
-        options.getOnTop().setOnAction(e -> {
-            primaryStage.setAlwaysOnTop(options.getOnTop().isSelected());
-        });
-        options.getClear().setOnAction(e -> {
-            grid.clear();
-        });
-        options.getPhysicsToggle().setOnAction(e -> {
-            boolean pause = options.getPhysicsToggle().getText().equals("Pause");
-            if (pause) {
-                options.getPhysicsToggle().setText("Play");
-            } else {
-                options.getPhysicsToggle().setText("Pause");
-            }
-            pane.setRunning(!pause);
-        });
-        optionsButton.setOnAction(event -> {
-            if (stackPane.getChildren().contains(borderPane)) {
-                stackPane.getChildren().remove(borderPane);
-                stackPane.getChildren().add(optionsButton);
-                optionsButton.setOnMouseEntered(e -> makeSolid(e));
-                optionsButton.setOnMouseExited(e -> makeTransparent(e));
-            } else {
-                optionsButton.setOnMouseEntered(null);
-                optionsButton.setOnMouseExited(null);
-                optionsButton.setOpacity(1);
-                stackPane.getChildren().remove(optionsButton);
-                borderPane.setLeft(optionsButton);
-                stackPane.getChildren().add(borderPane);
-            }
+        canvas.setOnMouseMoved(e -> {
+            mouseX = e.getX();
+            mouseY = e.getY();
         });
 
-        Scene scene = new Scene(stackPane);
-
-        scene.setOnKeyPressed(event -> {
-            switch (event.getCode()) {
-                case A:
-                    boolean auto = options.getAuto().isSelected();
-                    auto = !auto;
-                    options.getAuto().setSelected(auto);
-                    pane.setAuto(auto);
-                    break;
+        Scene scene = new Scene(new Pane(canvas, hud, controls));
+        scene.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
                 case DIGIT1:
-                    options.setParticleType(ParticleType.Sand);
+                    state.setType(ParticleType.SAND);
+                    state.setColor(Color.YELLOW);
                     break;
                 case DIGIT2:
-                    options.setParticleType(ParticleType.Water);
+                    state.setType(ParticleType.WATER);
+                    state.setColor(Color.BLUE);
                     break;
                 case DIGIT3:
-                    options.setParticleType(ParticleType.Rock);
+                    state.setType(ParticleType.ROCK);
+                    state.setColor(Color.BROWN);
                     break;
                 case DIGIT0:
-                    options.setParticleType(ParticleType.None);
+                    state.setType(ParticleType.AIR);
+                    state.setColor(Color.TRANSPARENT);
                     break;
+                case OPEN_BRACKET:
+                    state.setBrushSize(state.getBrushSize() - 1);
+                    break;
+                case CLOSE_BRACKET:
+                    state.setBrushSize(state.getBrushSize() + 1);
+                    break;
+
                 default:
                     break;
             }
         });
-        primaryStage.setTitle("1");
         primaryStage.setScene(scene);
         primaryStage.show();
+        controls.setTranslateX(canvas.getWidth() - controls.getWidth() - 10);
+        controls.setTranslateY(10);
 
-        AnimationTimer animationTimer = new AnimationTimer() {
-            private long lastTime = 0;
-            private int frameCount = 0;
+        new AnimationTimer() {
+            final long RATE = 16_666_667;
+            int frameTimeRefresh = 0;
+            long lastUpdate = 0;
 
             @Override
             public void handle(long now) {
-                calcFrames(now);
-                calcVisible();
-                calcNodes();
-                calcGridSize();
-                listSize();
-            }
+                long frameStart = System.nanoTime();
+                windLabel.setText(formatWind(field.getWind()));
+                toolLabel.setText(formatTool(state.getType()));
+                brushLabel.setText("Brush Size: " + state.getBrushSize());
+                particleCountLabel.setText("Particles: " + field.getParticleCount());
 
-            private void listSize() {
-                listSize.set(grid.getParticles().size());
-            }
+                if (isMousePressed) {
+                    int cx = (int) (mouseX / PIXEL_SIZE);
+                    int cy = (int) (mouseY / PIXEL_SIZE);
+                    int r = state.getBrushSize();
 
-            private void calcFrames(long now) {
-                frameCount++;
-                if (now - lastTime >= ONE_SECOND) {
-                    fps.set(frameCount);
-                    frameCount = 0;
-                    lastTime = now;
-                }
-            }
+                    for (int dx = -r; dx <= r; dx++) {
+                        for (int dy = -r; dy <= r; dy++) {
+                            int tx = cx + dx;
+                            int ty = cy + dy;
 
-            private void calcVisible() {
-                int visibleCount = 0;
-                Particle[][] particleGrid = grid.getGrid();
-                for (int x = 0; x < particleGrid.length; x++) {
-                    for (int y = 0; y < particleGrid[0].length; y++) {
-                        if (particleGrid[x][y] != null) {
-                            visibleCount++;
+                            if (dx * dx + dy * dy <= r * r) {
+                                if (state.getType() == ParticleType.AIR) {
+                                    field.removeParticle(tx, ty);
+                                } else {
+                                    field.addParticle(tx, ty, new Particle(state.getType(), state.getColor()));
+                                }
+                            }
                         }
                     }
                 }
-                visible.set(visibleCount);
+
+                if (now - lastUpdate >= RATE) {
+                    if (state.isAutoWind()) {
+                        windController.update();
+                        field.setWind(windController.getWind());
+                    }
+
+                    field.update();
+                    draw(canvas.getGraphicsContext2D(), field);
+
+                    if (frameTimeRefresh > 15) {
+                        double frameTimeMs = (System.nanoTime() - frameStart) / 1_000_000.0;
+                        frameTimeLabel.setText(String.format("Frame: %.2f ms", frameTimeMs));
+                        frameTimeRefresh = 0;
+                    }
+                    frameTimeRefresh++;
+                    lastUpdate = now;
+                }
             }
 
-            private void calcNodes() {
-                nodes.set((int) (grid.getHeight() * grid.getWidth()));
+            private String formatWind(double wind) {
+                String arrow = wind > 0 ? "Right" : wind < 0 ? "Left" : "None";
+                return String.format("Wind: %s (%.2f)", arrow, Math.abs(wind));
             }
 
-            private void calcGridSize() {
-                widthProp.set(grid.getGrid().length);
-                heightProp.set(grid.getGrid()[0].length);
+            private String formatTool(ParticleType type) {
+                return "Tool: " + (type != null ? type.name() : "None");
             }
 
-        };
-        animationTimer.start();
+        }.start();
 
     }
 
-    private void makeTransparent(MouseEvent e) {
-        ((Node) e.getSource()).setOpacity(.25);
+    private void draw(GraphicsContext gc, Field field) {
+        gc.clearRect(0, 0, WIDTH * PIXEL_SIZE, HEIGHT * PIXEL_SIZE);
+        Particle[][] grid = field.getGrid();
+
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                Particle p = grid[y][x];
+                if (p != null) {
+                    gc.setFill(p.getColor());
+                    gc.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+                }
+            }
+        }
     }
 
-    private void makeSolid(MouseEvent e) {
-        ((Node) e.getSource()).setOpacity(1);
+    public static void main(String[] args) {
+        launch(args);
     }
-
 }
