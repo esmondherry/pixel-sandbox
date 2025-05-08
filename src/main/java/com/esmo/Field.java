@@ -2,6 +2,8 @@ package com.esmo;
 
 import java.util.Random;
 
+import javafx.scene.paint.Color;
+
 public class Field {
     private Particle[][] grid;
     private int width;
@@ -98,14 +100,15 @@ public class Field {
             case ROCK:
             case AIR:
                 break;
+            case STEAM:
+                updateSteam(x, y);
+                break;
+
         }
     }
 
     private void updateSand(int x, int y) {
-        double windChance = Math.abs(wind) * (1.0 / ParticleType.SAND.getDensity());
-        if (random.nextDouble() < windChance) {
-            int direction = (int) Math.signum(wind);
-            tryMove(x, y, x + direction, y);
+        if (tryWind(x, y, ParticleType.SAND)) {
             return;
         }
 
@@ -133,29 +136,39 @@ public class Field {
     }
 
     private void updateWater(int x, int y) {
-        double windChance = Math.abs(wind) * (1.0 / ParticleType.WATER.getDensity());
-        if (random.nextDouble() < windChance) {
-            int direction = (int) Math.signum(wind);
-            tryMove(x, y, x + direction, y);
+        if (tryWind(x, y, ParticleType.WATER)) {
             return;
         }
 
-        if (tryMove(x, y, x, y + 1)) {
+        if (trySwapIfHeavier(x, y, x, y + 1)) {
             return;
         }
 
         int maxJump = 10;
+        boolean leftWater = true;
+        boolean rightWater = true;
         for (int offset = 1; offset <= maxJump; offset++) {
             if (inBounds(x - offset, y) && grid[y][x - offset] == null &&
-                    inBounds(x - offset, y + 1) && grid[y + 1][x - offset] == null) {
-                tryMove(x, y, x - offset, y
+                    inBounds(x - offset, y + 1) && grid[y + 1][x - offset] == null && leftWater) {
+                trySwapIfHeavier(x, y, x - offset, y
                         + 1);
                 return;
             }
             if (inBounds(x + offset, y) && grid[y][x + offset] == null &&
-                    inBounds(x + offset, y + 1) && grid[y + 1][x + offset] == null) {
-                tryMove(x, y, x + offset, y + 1);
+                    inBounds(x + offset, y + 1) && grid[y + 1][x + offset] == null && rightWater) {
+                trySwapIfHeavier(x, y, x + offset, y + 1);
                 return;
+            }
+            if (inBounds(x - offset, y) && grid[y][x - offset] != null
+                    && grid[y][x - offset].getType() != ParticleType.WATER) {
+                leftWater = false;
+            }
+            if (inBounds(x + offset, y) && grid[y][x + offset] != null
+                    && grid[y][x + offset].getType() != ParticleType.WATER) {
+                rightWater = false;
+            }
+            if (!rightWater && !leftWater) {
+                break;
             }
         }
 
@@ -171,6 +184,45 @@ public class Field {
                 return;
         }
 
+    }
+
+    private void updateSteam(int x, int y) {
+        Particle steam = grid[y][x];
+        steam.decrementTTL();
+
+        if (steam.getTTL() == 0) {
+            grid[y][x] = new Particle(ParticleType.WATER, Color.BLUE);
+            return;
+        }
+
+        if (tryWind(x, y, steam.getType())) {
+            return;
+        }
+
+        if (tryMove(x, y, x, y - 1))
+            return;
+
+        if (random.nextBoolean()) {
+            if (tryMove(x, y, x - 1, y - 1))
+                return;
+            if (tryMove(x, y, x + 1, y - 1))
+                return;
+        } else {
+            if (tryMove(x, y, x + 1, y - 1))
+                return;
+            if (tryMove(x, y, x - 1, y - 1))
+                return;
+        }
+    }
+
+    private boolean tryWind(int x, int y, ParticleType type) {
+        double windChance = Math.abs(wind) * (1.0 / type.getDensity());
+        if (random.nextDouble() < windChance) {
+            int direction = (int) Math.signum(wind);
+            tryMove(x, y, x + direction, y);
+            return true;
+        }
+        return false;
     }
 
     private boolean tryMove(int fromX, int fromY, int toX, int toY) {

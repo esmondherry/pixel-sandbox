@@ -1,5 +1,7 @@
 package com.esmo;
 
+import java.util.Random;
+
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -66,6 +68,11 @@ public class App extends Application {
                     state.setType(ParticleType.ROCK);
                     state.setColor(Color.BROWN);
                     break;
+                case DIGIT4:
+                    state.setType(ParticleType.STEAM);
+                    state.setColor(Color.LIGHTGRAY);
+                    break;
+
                 case DIGIT0:
                     state.setType(ParticleType.AIR);
                     state.setColor(Color.TRANSPARENT);
@@ -113,7 +120,11 @@ public class App extends Application {
                                 if (state.getType() == ParticleType.AIR) {
                                     field.removeParticle(tx, ty);
                                 } else {
-                                    field.addParticle(tx, ty, new Particle(state.getType(), state.getColor()));
+                                    Particle p = new Particle(state.getType(), state.getColor());
+                                    if (state.getType() == ParticleType.STEAM) {
+                                        p.setTTL(600 + new Random().nextInt(600));
+                                    }
+                                    field.addParticle(tx, ty, p);
                                 }
                             }
                         }

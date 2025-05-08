@@ -4,6 +4,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -13,6 +14,7 @@ public class Controls extends VBox {
 
     public Controls(AppState state, Field field) {
         super(8);
+        this.setMaxWidth(156);
         this.setStyle("-fx-background-color: rgba(0,0,0,0.5); -fx-padding: 8px;");
 
         this.setOnMousePressed(e -> {
@@ -33,32 +35,40 @@ public class Controls extends VBox {
             state.setType(ParticleType.SAND);
             state.setColor(Color.YELLOW);
         });
-        this.getChildren().add(sandButton);
+        // this.getChildren().add(sandButton);
 
         Button waterButton = new Button("Water");
         waterButton.setOnAction(e -> {
             state.setType(ParticleType.WATER);
             state.setColor(Color.BLUE);
         });
-        this.getChildren().add(waterButton);
+        // this.getChildren().add(waterButton);
 
         Button rockButton = new Button("Rock");
         rockButton.setOnAction(e -> {
             state.setType(ParticleType.ROCK);
             state.setColor(Color.BROWN);
         });
-        this.getChildren().add(rockButton);
+        // this.getChildren().add(rockButton);
+
         Button eraseButton = new Button("Air");
         eraseButton.setOnAction(e -> {
             state.setType(ParticleType.AIR);
             state.setColor(Color.TRANSPARENT);
         });
-        this.getChildren().add(eraseButton);
+        // this.getChildren().add(eraseButton);
 
+        Button steamButton = new Button("Steam");
+        steamButton.setOnAction(e -> {
+            state.setType(ParticleType.STEAM);
+            state.setColor(Color.LIGHTGRAY);
+        });
+        // this.getChildren().add(steamButton);
+        this.getChildren().add(new FlowPane(4, 4, sandButton, waterButton, rockButton, eraseButton, steamButton));
         Slider brushSlider = new Slider(1, 50, state.getBrushSize());
         brushSlider.setShowTickLabels(true);
         brushSlider.setShowTickMarks(true);
-        brushSlider.setMajorTickUnit(10 );
+        brushSlider.setMajorTickUnit(10);
         brushSlider.setSnapToTicks(true);
 
         brushSlider.valueProperty().addListener((obs, oldVal, newVal) -> {

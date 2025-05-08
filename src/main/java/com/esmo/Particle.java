@@ -6,11 +6,26 @@ public class Particle {
     private Color color;
     private ParticleType type;
     private boolean hasMoved;
+    private int ttl;
 
     public Particle(ParticleType type, Color color) {
         this.type = type;
         this.color = color;
         this.hasMoved = false;
+        this.ttl = -1;
+    }
+
+    public int getTTL() {
+        return ttl;
+    }
+
+    public void setTTL(int ttl) {
+        this.ttl = ttl;
+    }
+
+    public void decrementTTL() {
+        if (ttl > 0)
+            ttl--;
     }
 
     public Color getColor() {
@@ -36,10 +51,11 @@ public class Particle {
 }
 
 enum ParticleType {
-    AIR(0),
-    SAND(2),
-    WATER(1),
-    ROCK(10);
+    AIR(1),
+    SAND(3),
+    WATER(2),
+    ROCK(10),
+    STEAM(1);
 
     private final int density;
 
