@@ -124,7 +124,11 @@ public class App extends Application {
                                     if (state.getType() == ParticleType.STEAM) {
                                         p.setTTL(600 + new Random().nextInt(600));
                                     }
+                                    if (state.isReplaceParticle()) {
+                                        field.replaceParticle(tx, ty, p);
+                                    } else {
                                     field.addParticle(tx, ty, p);
+                                    }
                                 }
                             }
                         }

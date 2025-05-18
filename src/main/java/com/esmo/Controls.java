@@ -35,36 +35,32 @@ public class Controls extends VBox {
             state.setType(ParticleType.SAND);
             state.setColor(Color.WHEAT);
         });
-        // this.getChildren().add(sandButton);
 
         Button waterButton = new Button("Water");
         waterButton.setOnAction(e -> {
             state.setType(ParticleType.WATER);
             state.setColor(Color.BLUE);
         });
-        // this.getChildren().add(waterButton);
 
         Button rockButton = new Button("Rock");
         rockButton.setOnAction(e -> {
             state.setType(ParticleType.ROCK);
             state.setColor(Color.BROWN);
         });
-        // this.getChildren().add(rockButton);
 
         Button eraseButton = new Button("Air");
         eraseButton.setOnAction(e -> {
             state.setType(ParticleType.AIR);
             state.setColor(Color.TRANSPARENT);
         });
-        // this.getChildren().add(eraseButton);
 
         Button steamButton = new Button("Steam");
         steamButton.setOnAction(e -> {
             state.setType(ParticleType.STEAM);
             state.setColor(Color.LIGHTGRAY);
         });
-        // this.getChildren().add(steamButton);
         this.getChildren().add(new FlowPane(4, 4, sandButton, waterButton, rockButton, eraseButton, steamButton));
+
         Slider brushSlider = new Slider(1, 50, state.getBrushSize());
         brushSlider.setShowTickLabels(true);
         brushSlider.setShowTickMarks(true);
@@ -97,6 +93,13 @@ public class Controls extends VBox {
             windSlider.setDisable(state.isAutoWind());
         });
         this.getChildren().add(autoWindCheckbox);
+
+        CheckBox replaceCheckBox = new CheckBox("Replace");
+        replaceCheckBox.setSelected(true);
+        replaceCheckBox.setOnAction(e -> {
+            state.setReplaceParticle(replaceCheckBox.isSelected());
+        });
+        this.getChildren().add(replaceCheckBox);
 
         // TODO set defaults
         sandButton.fire();

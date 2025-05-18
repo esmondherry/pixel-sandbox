@@ -42,6 +42,12 @@ public class Field {
     }
 
     public void addParticle(int x, int y, Particle particle) {
+        if (inBounds(x, y) && grid[y][x] == null) {
+            grid[y][x] = particle;
+        }
+    }
+
+    public void replaceParticle(int x, int y, Particle particle) {
         if (inBounds(x, y)) {
             grid[y][x] = particle;
         }

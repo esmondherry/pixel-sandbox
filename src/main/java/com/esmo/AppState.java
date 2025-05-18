@@ -7,12 +7,21 @@ public class AppState {
     private Color color;
     private int brushSize;
     private boolean autoWind;
+    private boolean replaceParticle;
 
     public AppState() {
         type = ParticleType.SAND;
         color = Color.WHEAT;
         brushSize = 1;
         autoWind = false;
+    }
+
+    public boolean isReplaceParticle() {
+        return replaceParticle;
+    }
+
+    public void setReplaceParticle(boolean replaceParticle) {
+        this.replaceParticle = replaceParticle;
     }
 
     public boolean isAutoWind() {
@@ -46,4 +55,5 @@ public class AppState {
     public void setBrushSize(int size) {
         this.brushSize = Math.max(1, size);
     }
+
 }
