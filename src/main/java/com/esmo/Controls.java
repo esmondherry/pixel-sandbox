@@ -33,7 +33,7 @@ public class Controls extends VBox {
         Button sandButton = new Button("Sand");
         sandButton.setOnAction(e -> {
             state.setType(ParticleType.SAND);
-            state.setColor(Color.YELLOW);
+            state.setColor(Color.WHEAT);
         });
         // this.getChildren().add(sandButton);
 

@@ -58,7 +58,7 @@ public class App extends Application {
             switch (e.getCode()) {
                 case DIGIT1:
                     state.setType(ParticleType.SAND);
-                    state.setColor(Color.YELLOW);
+                    state.setColor(Color.WHEAT);
                     break;
                 case DIGIT2:
                     state.setType(ParticleType.WATER);

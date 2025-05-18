@@ -10,7 +10,7 @@ public class AppState {
 
     public AppState() {
         type = ParticleType.SAND;
-        color = Color.YELLOW;
+        color = Color.WHEAT;
         brushSize = 1;
         autoWind = false;
     }
