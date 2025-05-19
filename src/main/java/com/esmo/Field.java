@@ -109,8 +109,38 @@ public class Field {
             case STEAM:
                 updateSteam(x, y);
                 break;
+            case FIRE:
+                updateFire(x, y);
+                break;
+            case SMOKE:
+                updateSmoke(x, y);
+                break;
 
         }
+    }
+
+    private void updateSmoke(int x, int y) {
+        if (decay(x, y, ParticleType.AIR, null)) {
+            return;
+        }
+        moveGas(x, y);
+    }
+
+    private void updateFire(int x, int y) {
+        if (decay(x, y, ParticleType.SMOKE, Color.GREY)) {
+            return;
+        }
+        if (random.nextDouble() < .01) {
+            addParticle(x - 1, y, new Particle(ParticleType.SMOKE, Color.GREY));
+
+        } else if (random.nextDouble() < .02) {
+
+            addParticle(x, y - 1, new Particle(ParticleType.SMOKE, Color.GREY));
+        } else if (random.nextDouble() < .03) {
+
+            addParticle(x + 1, y, new Particle(ParticleType.SMOKE, Color.GREY));
+        }
+
     }
 
     private void updateSand(int x, int y) {
@@ -193,32 +223,47 @@ public class Field {
     }
 
     private void updateSteam(int x, int y) {
-        Particle steam = grid[y][x];
-        steam.decrementTTL();
-
-        if (steam.getTTL() == 0) {
-            grid[y][x] = new Particle(ParticleType.WATER, Color.BLUE);
+        if (decay(x, y, ParticleType.WATER, Color.BLUE)) {
             return;
         }
+        moveGas(x, y);
+    }
 
-        if (tryWind(x, y, steam.getType())) {
-            return;
+    private boolean decay(int x, int y, ParticleType particleType, Color color) {
+        grid[y][x].decrementTTL();
+        if (grid[y][x].getTTL() == 0) {
+            if (particleType == null || particleType == ParticleType.AIR) {
+                grid[y][x] = null;
+            } else {
+                grid[y][x] = new Particle(particleType, color);
+                grid[y][x].setTTL(600 + new Random().nextInt(600));
+
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean moveGas(int x, int y) {
+        if (tryWind(x, y, grid[y][x].getType())) {
+            return true;
         }
 
         if (tryMove(x, y, x, y - 1))
-            return;
+            return true;
 
         if (random.nextBoolean()) {
             if (tryMove(x, y, x - 1, y - 1))
-                return;
+                return true;
             if (tryMove(x, y, x + 1, y - 1))
-                return;
+                return true;
         } else {
             if (tryMove(x, y, x + 1, y - 1))
-                return;
+                return true;
             if (tryMove(x, y, x - 1, y - 1))
-                return;
+                return true;
         }
+        return false;
     }
 
     private boolean tryWind(int x, int y, ParticleType type) {

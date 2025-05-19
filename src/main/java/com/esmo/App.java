@@ -72,7 +72,14 @@ public class App extends Application {
                     state.setType(ParticleType.STEAM);
                     state.setColor(Color.LIGHTGRAY);
                     break;
-
+                case DIGIT5:
+                    state.setType(ParticleType.FIRE);
+                    state.setColor(Color.RED);
+                    break;
+                case DIGIT6:
+                    state.setType(ParticleType.SMOKE);
+                    state.setColor(Color.GREY);
+                    break;
                 case DIGIT0:
                     state.setType(ParticleType.AIR);
                     state.setColor(Color.TRANSPARENT);
@@ -121,6 +128,12 @@ public class App extends Application {
                                     field.removeParticle(tx, ty);
                                 } else {
                                     Particle p = new Particle(state.getType(), state.getColor());
+                                    if (state.getType() == ParticleType.FIRE) {
+                                        p.setTTL(600 + new Random().nextInt(600));
+                                    }
+                                    if (state.getType() == ParticleType.SMOKE) {
+                                        p.setTTL(600 + new Random().nextInt(600));
+                                    }
                                     if (state.getType() == ParticleType.STEAM) {
                                         p.setTTL(600 + new Random().nextInt(600));
                                     }

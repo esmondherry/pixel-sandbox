@@ -55,7 +55,10 @@ enum ParticleType {
     SAND(3),
     WATER(2),
     ROCK(10),
-    STEAM(1);
+    STEAM(1),
+    FIRE(1),
+    SMOKE(1),
+    ;
 
     private final int density;
 
