@@ -123,7 +123,7 @@ public class Field {
         if (decay(x, y, ParticleType.AIR, null)) {
             return;
         }
-        moveGas(x, y);
+        moveGas(x, y, 5);
     }
 
     private void updateFire(int x, int y) {
@@ -246,7 +246,7 @@ public class Field {
         if (decay(x, y, ParticleType.WATER, Color.BLUE)) {
             return;
         }
-        moveGas(x, y);
+        moveGas(x, y, 5);
     }
 
     private boolean decay(int x, int y, ParticleType particleType, Color color) {
@@ -264,13 +264,42 @@ public class Field {
         return false;
     }
 
-    private boolean moveGas(int x, int y) {
+    private boolean moveGas(int x, int y, int spread) {
         if (tryWind(x, y, grid[y][x].getType())) {
             return true;
         }
 
-        if (tryMove(x, y, x, y - 1))
+        if (tryMove(x, y, x, y - 1)) {
             return true;
+        }
+
+        int maxJump = spread;
+        boolean leftGas = true;
+        boolean rightGas = true;
+
+        for (int offset = 1; offset <= maxJump; offset++) {
+            if (inBounds(x - offset, y) && grid[y][x - offset] == null &&
+                    inBounds(x - offset, y - 1) && grid[y - 1][x - offset] == null && leftGas) {
+                tryMove(x, y, x - offset, y - 1);
+                return true;
+            }
+            if (inBounds(x + offset, y) && grid[y][x + offset] == null &&
+                    inBounds(x + offset, y - 1) && grid[y - 1][x + offset] == null && rightGas) {
+                tryMove(x, y, x + offset, y - 1);
+                return true;
+            }
+            if (inBounds(x - offset, y) && grid[y][x - offset] != null
+                    && grid[y][x - offset].getType() != grid[y][x].getType()) {
+                leftGas = false;
+            }
+            if (inBounds(x + offset, y) && grid[y][x + offset] != null
+                    && grid[y][x + offset].getType() != grid[y][x].getType()) {
+                rightGas = false;
+            }
+            if (!leftGas && !rightGas) {
+                break;
+            }
+        }
 
         if (random.nextBoolean()) {
             if (tryMove(x, y, x - 1, y - 1))
