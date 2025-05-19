@@ -130,6 +130,26 @@ public class Field {
         if (decay(x, y, ParticleType.SMOKE, Color.GREY)) {
             return;
         }
+        Particle steam = new Particle(ParticleType.STEAM, Color.LIGHTGRAY);
+        Particle smoke = new Particle(ParticleType.SMOKE, Color.GREY);
+        smoke.setTTL(600 + new Random().nextInt(600));
+        steam.setTTL(600 + new Random().nextInt(600));
+
+        if (inBounds(x - 1, y) && grid[y][x - 1] != null && grid[y][x - 1].getType() == ParticleType.WATER) {
+            replaceParticle(x - 1, y, steam);
+            replaceParticle(x, y, smoke);
+
+        }
+        if (inBounds(x, y - 1) && grid[y - 1][x] != null && grid[y - 1][x].getType() == ParticleType.WATER) {
+            replaceParticle(x, y - 1, steam);
+            replaceParticle(x, y, smoke);
+
+        }
+        if (inBounds(x + 1, y) && grid[y][x + 1] != null && grid[y][x + 1].getType() == ParticleType.WATER) {
+            replaceParticle(x + 1, y, steam);
+            replaceParticle(x, y, smoke);
+
+        }
         if (random.nextDouble() < .01) {
             addParticle(x - 1, y, new Particle(ParticleType.SMOKE, Color.GREY));
 
