@@ -1,6 +1,12 @@
 package com.esmo;
 
-import java.util.Random;
+import com.esmo.particle.Air;
+import com.esmo.particle.Particle;
+import com.esmo.particle.Rock;
+import com.esmo.particle.Sand;
+import com.esmo.particle.Smoke;
+import com.esmo.particle.Steam;
+import com.esmo.particle.Water;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -14,9 +20,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class App extends Application {
-    private static final int WIDTH = 640;
-    private static final int HEIGHT = 480;
-    private static final int PIXEL_SIZE = 2;
+    private static final int WIDTH = 320;
+    private static final int HEIGHT = 240;
+    private static final int PIXEL_SIZE = 4;
 
     private boolean isMousePressed = false;
     private double mouseX, mouseY;
@@ -62,15 +68,15 @@ public class App extends Application {
                     break;
                 case DIGIT2:
                     state.setType(ParticleType.WATER);
-                    state.setColor(Color.BLUE);
+                    state.setColor(null);
                     break;
                 case DIGIT3:
                     state.setType(ParticleType.ROCK);
-                    state.setColor(Color.BROWN);
+                    state.setColor(null);
                     break;
                 case DIGIT4:
                     state.setType(ParticleType.STEAM);
-                    state.setColor(Color.LIGHTGRAY);
+                    state.setColor(null);
                     break;
                 case DIGIT5:
                     state.setType(ParticleType.FIRE);
@@ -80,6 +86,7 @@ public class App extends Application {
                     state.setType(ParticleType.SMOKE);
                     state.setColor(Color.GREY);
                     break;
+
                 case DIGIT0:
                     state.setType(ParticleType.AIR);
                     state.setColor(Color.TRANSPARENT);
@@ -116,7 +123,7 @@ public class App extends Application {
                 if (isMousePressed) {
                     int cx = (int) (mouseX / PIXEL_SIZE);
                     int cy = (int) (mouseY / PIXEL_SIZE);
-                    int r = state.getBrushSize();
+                    int r = state.getBrushSize() - 1;
 
                     for (int dx = -r; dx <= r; dx++) {
                         for (int dy = -r; dy <= r; dy++) {
@@ -127,20 +134,36 @@ public class App extends Application {
                                 if (state.getType() == ParticleType.AIR) {
                                     field.removeParticle(tx, ty);
                                 } else {
-                                    Particle p = new Particle(state.getType(), state.getColor());
-                                    if (state.getType() == ParticleType.FIRE) {
-                                        p.setTTL(600 + new Random().nextInt(600));
+                                    Particle p;
+                                    switch (state.getType()) {
+                                        case WATER:
+                                            p = new Water();
+                                            break;
+                                        case STEAM:
+                                            p = new Steam();
+                                            break;
+                                        case SMOKE:
+                                            p = new Smoke();
+                                            break;
+                                        case ROCK:
+                                            p = new Rock();
+                                            break;
+                                        case SAND:
+                                            p = new Sand();
+                                            break;
+                                        default:
+                                            p = new Air();
+                                            break;
+
                                     }
-                                    if (state.getType() == ParticleType.SMOKE) {
-                                        p.setTTL(600 + new Random().nextInt(600));
+                                    if (state.getColor() != null) {
+                                        p.setColor(state.getColor());
                                     }
-                                    if (state.getType() == ParticleType.STEAM) {
-                                        p.setTTL(600 + new Random().nextInt(600));
-                                    }
+
                                     if (state.isReplaceParticle()) {
                                         field.replaceParticle(tx, ty, p);
                                     } else {
-                                    field.addParticle(tx, ty, p);
+                                        field.addParticle(tx, ty, p);
                                     }
                                 }
                             }

@@ -2,7 +2,9 @@ package com.esmo;
 
 import java.util.Random;
 
-import javafx.scene.paint.Color;
+import com.esmo.particle.Particle;
+import com.esmo.particle.Smoke;
+import com.esmo.particle.Steam;
 
 public class Field {
     private Particle[][] grid;
@@ -93,230 +95,38 @@ public class Field {
 
     private void applyPhysics(int x, int y) {
         Particle particle = grid[y][x];
-        if (particle == null || particle.hasMoved()) {
+        if (particle == null || particle.hasMoved() || particle.getType() == ParticleType.AIR) {
             return;
         }
-        switch (particle.getType()) {
-            case SAND:
-                updateSand(x, y);
-                break;
-            case WATER:
-                updateWater(x, y);
-                break;
-            case ROCK:
-            case AIR:
-                break;
-            case STEAM:
-                updateSteam(x, y);
-                break;
-            case FIRE:
-                updateFire(x, y);
-                break;
-            case SMOKE:
-                updateSmoke(x, y);
-                break;
 
-        }
-    }
-
-    private void updateSmoke(int x, int y) {
-        if (decay(x, y, ParticleType.AIR, null)) {
-            return;
-        }
-        moveGas(x, y, 5);
-    }
-
-    private void updateFire(int x, int y) {
-        if (decay(x, y, ParticleType.SMOKE, Color.GREY)) {
-            return;
-        }
-        Particle steam = new Particle(ParticleType.STEAM, Color.LIGHTGRAY);
-        Particle smoke = new Particle(ParticleType.SMOKE, Color.GREY);
-        smoke.setTTL(600 + new Random().nextInt(600));
-        steam.setTTL(600 + new Random().nextInt(600));
-
-        if (inBounds(x - 1, y) && grid[y][x - 1] != null && grid[y][x - 1].getType() == ParticleType.WATER) {
-            replaceParticle(x - 1, y, steam);
-            replaceParticle(x, y, smoke);
-
-        }
-        if (inBounds(x, y - 1) && grid[y - 1][x] != null && grid[y - 1][x].getType() == ParticleType.WATER) {
-            replaceParticle(x, y - 1, steam);
-            replaceParticle(x, y, smoke);
-
-        }
-        if (inBounds(x + 1, y) && grid[y][x + 1] != null && grid[y][x + 1].getType() == ParticleType.WATER) {
-            replaceParticle(x + 1, y, steam);
-            replaceParticle(x, y, smoke);
-
-        }
-        if (random.nextDouble() < .01) {
-            addParticle(x - 1, y, new Particle(ParticleType.SMOKE, Color.GREY));
-
-        } else if (random.nextDouble() < .02) {
-
-            addParticle(x, y - 1, new Particle(ParticleType.SMOKE, Color.GREY));
-        } else if (random.nextDouble() < .03) {
-
-            addParticle(x + 1, y, new Particle(ParticleType.SMOKE, Color.GREY));
-        }
+        particle.update(x, y, this);
 
     }
 
-    private void updateSand(int x, int y) {
-        if (tryWind(x, y, ParticleType.SAND)) {
-            return;
-        }
+    public boolean decay(int x, int y, Particle replacement) {
+        Particle particle = grid[y][x];
 
-        if (trySwapIfHeavier(x, y, x, y + 1)) {
-            return;
-        }
-
-        if (random.nextBoolean()) {
-            if (random.nextBoolean()) {
-                if (trySwapIfHeavier(x, y, x - 1, y + 1)) {
-                    return;
-                }
-                if (trySwapIfHeavier(x, y, x + 1, y + 1)) {
-                    return;
-                }
-            } else {
-                if (trySwapIfHeavier(x, y, x + 1, y + 1)) {
-                    return;
-                }
-                if (trySwapIfHeavier(x, y, x - 1, y + 1)) {
-                    return;
-                }
-            }
-        }
-    }
-
-    private void updateWater(int x, int y) {
-        if (tryWind(x, y, ParticleType.WATER)) {
-            return;
-        }
-
-        if (trySwapIfHeavier(x, y, x, y + 1)) {
-            return;
-        }
-
-        int maxJump = 10;
-        boolean leftWater = true;
-        boolean rightWater = true;
-        for (int offset = 1; offset <= maxJump; offset++) {
-            if (inBounds(x - offset, y) && grid[y][x - offset] == null &&
-                    inBounds(x - offset, y + 1) && grid[y + 1][x - offset] == null && leftWater) {
-                trySwapIfHeavier(x, y, x - offset, y
-                        + 1);
-                return;
-            }
-            if (inBounds(x + offset, y) && grid[y][x + offset] == null &&
-                    inBounds(x + offset, y + 1) && grid[y + 1][x + offset] == null && rightWater) {
-                trySwapIfHeavier(x, y, x + offset, y + 1);
-                return;
-            }
-            if (inBounds(x - offset, y) && grid[y][x - offset] != null
-                    && grid[y][x - offset].getType() != ParticleType.WATER) {
-                leftWater = false;
-            }
-            if (inBounds(x + offset, y) && grid[y][x + offset] != null
-                    && grid[y][x + offset].getType() != ParticleType.WATER) {
-                rightWater = false;
-            }
-            if (!rightWater && !leftWater) {
-                break;
-            }
-        }
-
-        if (random.nextBoolean()) {
-            if (tryMove(x, y, x - 1, y))
-                return;
-            if (tryMove(x, y, x + 1, y))
-                return;
-        } else {
-            if (tryMove(x, y, x + 1, y))
-                return;
-            if (tryMove(x, y, x - 1, y))
-                return;
-        }
-
-    }
-
-    private void updateSteam(int x, int y) {
-        if (decay(x, y, ParticleType.WATER, Color.BLUE)) {
-            return;
-        }
-        moveGas(x, y, 5);
-    }
-
-    private boolean decay(int x, int y, ParticleType particleType, Color color) {
-        grid[y][x].decrementTTL();
-        if (grid[y][x].getTTL() == 0) {
-            if (particleType == null || particleType == ParticleType.AIR) {
-                grid[y][x] = null;
-            } else {
-                grid[y][x] = new Particle(particleType, color);
-                grid[y][x].setTTL(600 + new Random().nextInt(600));
-
-            }
+        particle.decrementTTL();
+        if (particle.getTTL() == 0) {
+            grid[y][x] = replacement;
             return true;
         }
         return false;
     }
 
-    private boolean moveGas(int x, int y, int spread) {
-        if (tryWind(x, y, grid[y][x].getType())) {
+    public boolean decay(int x, int y) {
+        Particle particle = grid[y][x];
+
+        particle.decrementTTL();
+        if (particle.getTTL() == 0) {
+            grid[y][x] = null;
             return true;
-        }
-
-        if (tryMove(x, y, x, y - 1)) {
-            return true;
-        }
-
-        int maxJump = spread;
-        boolean leftGas = true;
-        boolean rightGas = true;
-
-        for (int offset = 1; offset <= maxJump; offset++) {
-            if (inBounds(x - offset, y) && grid[y][x - offset] == null &&
-                    inBounds(x - offset, y - 1) && grid[y - 1][x - offset] == null && leftGas) {
-                tryMove(x, y, x - offset, y - 1);
-                return true;
-            }
-            if (inBounds(x + offset, y) && grid[y][x + offset] == null &&
-                    inBounds(x + offset, y - 1) && grid[y - 1][x + offset] == null && rightGas) {
-                tryMove(x, y, x + offset, y - 1);
-                return true;
-            }
-            if (inBounds(x - offset, y) && grid[y][x - offset] != null
-                    && grid[y][x - offset].getType() != grid[y][x].getType()) {
-                leftGas = false;
-            }
-            if (inBounds(x + offset, y) && grid[y][x + offset] != null
-                    && grid[y][x + offset].getType() != grid[y][x].getType()) {
-                rightGas = false;
-            }
-            if (!leftGas && !rightGas) {
-                break;
-            }
-        }
-
-        if (random.nextBoolean()) {
-            if (tryMove(x, y, x - 1, y - 1))
-                return true;
-            if (tryMove(x, y, x + 1, y - 1))
-                return true;
-        } else {
-            if (tryMove(x, y, x + 1, y - 1))
-                return true;
-            if (tryMove(x, y, x - 1, y - 1))
-                return true;
         }
         return false;
     }
 
-    private boolean tryWind(int x, int y, ParticleType type) {
-        double windChance = Math.abs(wind) * (1.0 / type.getDensity());
+    public boolean tryWind(int x, int y, ParticleType type) {
+        double windChance = Math.abs(wind) * (1.0 / getParticle(x, y).getDensity());
         if (random.nextDouble() < windChance) {
             int direction = (int) Math.signum(wind);
             tryMove(x, y, x + direction, y);
@@ -325,7 +135,7 @@ public class Field {
         return false;
     }
 
-    private boolean tryMove(int fromX, int fromY, int toX, int toY) {
+    public boolean tryMove(int fromX, int fromY, int toX, int toY) {
         if (!inBounds(toX, toY) || grid[toY][toX] != null) {
             return false;
         }
@@ -338,7 +148,7 @@ public class Field {
         return true;
     }
 
-    private boolean trySwapIfHeavier(int fromX, int fromY, int toX, int toY) {
+    public boolean trySwapIfHeavier(int fromX, int fromY, int toX, int toY) {
         if (!inBounds(toX, toY)) {
             return false;
         }
@@ -362,8 +172,12 @@ public class Field {
         return false;
     }
 
-    private boolean inBounds(int x, int y) {
+    public boolean inBounds(int x, int y) {
         return x >= 0 && y >= 0 && x < width && y < height;
+    }
+
+    public Particle getParticle(int x, int y) {
+        return grid[y][x];
     }
 
 }

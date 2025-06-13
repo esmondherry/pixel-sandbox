@@ -1,18 +1,23 @@
-package com.esmo;
+package com.esmo.particle;
+
+import com.esmo.Field;
+import com.esmo.ParticleType;
 
 import javafx.scene.paint.Color;
 
-public class Particle {
+public abstract class Particle {
     private Color color;
     private ParticleType type;
     private boolean hasMoved;
     private int ttl;
+    private int density;
 
-    public Particle(ParticleType type, Color color) {
+    public Particle(ParticleType type, Color color, int density) {
         this.type = type;
         this.color = color;
         this.hasMoved = false;
         this.ttl = -1;
+        this.density = density;
     }
 
     public int getTTL() {
@@ -26,6 +31,10 @@ public class Particle {
     public void decrementTTL() {
         if (ttl > 0)
             ttl--;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public Color getColor() {
@@ -45,28 +54,9 @@ public class Particle {
     }
 
     public int getDensity() {
-        return type.getDensity();
-    }
-
-}
-
-enum ParticleType {
-    AIR(1),
-    SAND(3),
-    WATER(2),
-    ROCK(10),
-    STEAM(1),
-    FIRE(1),
-    SMOKE(1),
-    ;
-
-    private final int density;
-
-    ParticleType(int density) {
-        this.density = density;
-    }
-
-    public int getDensity() {
         return density;
     }
+
+    public abstract void update(int x, int y, Field field);
+
 }

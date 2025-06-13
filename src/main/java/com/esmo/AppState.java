@@ -14,6 +14,7 @@ public class AppState {
         color = Color.WHEAT;
         brushSize = 1;
         autoWind = false;
+        replaceParticle = true;
     }
 
     public boolean isReplaceParticle() {

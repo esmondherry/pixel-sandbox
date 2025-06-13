@@ -39,13 +39,25 @@ public class Controls extends VBox {
         Button waterButton = new Button("Water");
         waterButton.setOnAction(e -> {
             state.setType(ParticleType.WATER);
-            state.setColor(Color.BLUE);
+            state.setColor(null);
         });
 
         Button rockButton = new Button("Rock");
         rockButton.setOnAction(e -> {
             state.setType(ParticleType.ROCK);
-            state.setColor(Color.BROWN);
+            state.setColor(null);
+        });
+
+        Button steamButton = new Button("Steam");
+        steamButton.setOnAction(e -> {
+            state.setType(ParticleType.STEAM);
+            state.setColor(null);
+        });
+
+        Button smokeButton = new Button("Smoke");
+        smokeButton.setOnAction(e -> {
+            state.setType(ParticleType.SMOKE);
+            state.setColor(null);
         });
 
         Button eraseButton = new Button("Air");
@@ -53,13 +65,8 @@ public class Controls extends VBox {
             state.setType(ParticleType.AIR);
             state.setColor(Color.TRANSPARENT);
         });
-
-        Button steamButton = new Button("Steam");
-        steamButton.setOnAction(e -> {
-            state.setType(ParticleType.STEAM);
-            state.setColor(Color.LIGHTGRAY);
-        });
-        this.getChildren().add(new FlowPane(4, 4, sandButton, waterButton, rockButton, eraseButton, steamButton));
+        this.getChildren()
+                .add(new FlowPane(4, 4, sandButton, waterButton, rockButton, steamButton, smokeButton, eraseButton));
 
         Slider brushSlider = new Slider(1, 50, state.getBrushSize());
         brushSlider.setShowTickLabels(true);
@@ -95,7 +102,7 @@ public class Controls extends VBox {
         this.getChildren().add(autoWindCheckbox);
 
         CheckBox replaceCheckBox = new CheckBox("Replace");
-        replaceCheckBox.setSelected(true);
+        replaceCheckBox.setSelected(state.isReplaceParticle());
         replaceCheckBox.setOnAction(e -> {
             state.setReplaceParticle(replaceCheckBox.isSelected());
         });
